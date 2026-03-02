@@ -1,12 +1,3 @@
 {
-  "collaborations": [
-    {
-      "name": "Example Collab Project",
-      "description": "A project I collaborated on with others.",
-      "url": "https://github.com/org/example-repo",
-      "collaborators": ["CollaboratorA", "CollaboratorB"],
-      "role": "Contributor",
-      "icon": "fas fa-users"
-    }
-  ]
+  "collaborations": []
 }

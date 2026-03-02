@@ -183,11 +183,10 @@ function computeLanguages(repos) {
 
   document.getElementById('languages-chart').innerHTML = sorted.map(([lang, count]) => {
     const pct = Math.round((count / total) * 100);
-    const color = LANG_COLORS[lang] || '#8b949e';
     return `
       <div class="lang-bar">
         <span class="lang-name">${lang}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}"></div></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
         <span class="lang-pct">${pct}%</span>
       </div>`;
   }).join('');
@@ -239,22 +238,25 @@ function openRepoModal(repo) {
   };
   iconEl.style.display = 'block';
 
-  // Social preview — try repo's own social image first
+  // Social preview — try repo's own social image, then OpenGraph
   const previewEl = document.getElementById('modal-social-preview');
-  // Try the custom social preview from the repo's .github folder first
-  const customPreview = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/social-preview.png`;
-  previewEl.src = customPreview;
-  previewEl.onerror = function () {
-    // Fall back to GitHub-generated OpenGraph image
-    this.src = socialPreviewUrl;
-    this.onerror = function () {
-      this.classList.remove('visible');
-    };
-  };
-  previewEl.onload = function () {
-    this.classList.add('visible');
-  };
   previewEl.classList.remove('visible');
+
+  // Chain: custom .github/social-preview.png → GitHub OpenGraph image
+  const customPreview = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/social-preview.png`;
+
+  // We use a test image to check if custom preview exists
+  const testImg = new Image();
+  testImg.onload = function () {
+    previewEl.src = customPreview;
+    previewEl.classList.add('visible');
+  };
+  testImg.onerror = function () {
+    // Use GitHub's OpenGraph image (always exists for public repos)
+    previewEl.src = socialPreviewUrl;
+    previewEl.classList.add('visible');
+  };
+  testImg.src = customPreview;
 
   document.getElementById('modal-title').textContent = repo.name;
   document.getElementById('modal-language').innerHTML = repo.language
@@ -303,7 +305,10 @@ async function loadCollaborations() {
   const collabs = data.collaborations || [];
 
   if (collabs.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i>No collaborations listed yet.</div>';
+    const section = document.getElementById('collaborations');
+    if (section) section.style.display = 'none';
+    const navLink = document.querySelector('a[href="#collaborations"]');
+    if (navLink) navLink.closest('li').style.display = 'none';
     return;
   }
 
@@ -342,7 +347,11 @@ async function loadStoreApps() {
   });
 
   if (items.length === 0) {
-    grid.innerHTML = '<div class="empty-state"><i class="fas fa-store"></i>No apps or extensions listed yet.</div>';
+    // Hide the entire section and its nav link when there are no real listings
+    const section = document.getElementById('store-apps');
+    if (section) section.style.display = 'none';
+    const navLink = document.querySelector('a[href="#store-apps"]');
+    if (navLink) navLink.closest('li').style.display = 'none';
     return;
   }
 
