@@ -149,17 +149,21 @@ function renderRepos(repos) {
   grid.innerHTML = repos.map((repo, i) => {
     const langColor = LANG_COLORS[repo.language] || '#8b949e';
     const overrideIcon = ICON_OVERRIDES[repo.name];
-    const iconUrl = overrideIcon || `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
     const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
 
     const socialPreviewHtml = isExpanded
       ? `<img class="repo-card-preview" src="${socialPreviewUrl}" alt="" onerror="this.style.display='none'">`
       : '';
 
+    const letter = (repo.name.charAt(0) || '?').toUpperCase();
+    const iconHtml = overrideIcon
+      ? `<img class="repo-card-icon" src="${overrideIcon}" alt="" onerror="repoIconFallback(this)">`
+      : `<div class="repo-card-icon-placeholder">${letter}</div>`;
+
     return `
       <div class="repo-card ${isExpanded ? 'repo-card-expanded' : ''} fade-in" data-index="${i}" data-fork="${repo.fork}" style="animation-delay: ${i * 0.03}s">
         <div class="repo-card-header">
-          <img class="repo-card-icon" src="${iconUrl}" alt="" onerror="repoIconFallback(this)">
+          ${iconHtml}
           <div>
             <span class="repo-card-title">${escapeHtml(repo.name)}</span>
             ${repo.fork ? '<span class="repo-card-fork">Fork</span>' : ''}
@@ -220,17 +224,18 @@ function openRepoModal(repo) {
   const modal = document.getElementById('repo-modal');
   const langColor = LANG_COLORS[repo.language] || '#8b949e';
   const overrideIcon = ICON_OVERRIDES[repo.name];
-  const iconUrl = overrideIcon || `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
   // Social preview: use opengraph image
   const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
 
-  // Icon — try override or .github/icon.png → hide on error
+  // Icon — only show image if there's an override, otherwise hide
   const iconEl = document.getElementById('modal-icon');
-  iconEl.src = iconUrl;
-  iconEl.style.display = 'block';
-  iconEl.onerror = function () {
-    this.style.display = 'none';
-  };
+  if (overrideIcon) {
+    iconEl.src = overrideIcon;
+    iconEl.style.display = 'block';
+    iconEl.onerror = function () { this.style.display = 'none'; };
+  } else {
+    iconEl.style.display = 'none';
+  }
 
   // Social preview — try repo's own social image, then OpenGraph
   const previewEl = document.getElementById('modal-social-preview');
