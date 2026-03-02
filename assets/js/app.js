@@ -1112,7 +1112,7 @@ async function init() {
 
 init();
 
-// ===== ORBITING SOCIAL BUTTONS =====
+// ===== ORBITING SOCIAL BUTTONS — 3D RING (EDGE-ON) =====
 (function () {
   function initOrbitSocials() {
     const container = document.getElementById('hero-socials');
@@ -1122,67 +1122,104 @@ init();
     const wrapper = container.closest('.avatar-orbit-wrapper');
     if (!wrapper) return;
 
-    // Position buttons in a circle around the avatar
-    function positionInOrbit() {
-      const wW = wrapper.offsetWidth;
-      const wH = wrapper.offsetHeight;
-      const radius = Math.max(wW, wH) / 2 + 8;
-      btns.forEach((btn, i) => {
-        const angle = (2 * Math.PI * i) / count - Math.PI / 2;
-        const cx = wW / 2 + radius * Math.cos(angle) - btn.offsetWidth / 2;
-        const cy = wH / 2 + radius * Math.sin(angle) - btn.offsetHeight / 2;
-        btn.style.left = cx + 'px';
-        btn.style.top = cy + 'px';
-      });
-    }
+    const SPEED = 0.0007;        // radians per ms
+    const RADIUS_X = 108;        // horizontal radius (wide)
+    const RADIUS_Y = 18;         // vertical radius (flat — ring viewed at slight angle)
+    const SCALE_FRONT = 1.05;
+    const SCALE_BACK = 0.6;
+    const OPACITY_FRONT = 1.0;
+    const OPACITY_BACK = 0.35;
 
-    positionInOrbit();
-    window.addEventListener('resize', () => {
-      if (container.classList.contains('orbit-mode')) positionInOrbit();
-    });
-
-    // Scroll handler — progressive fly-off as you scroll past hero
     const heroSection = document.getElementById('hero');
     let isDocked = false;
+    let flyT = 0;                // smoothed scroll progress 0..1
+    let startTime = performance.now();
 
-    function onScroll() {
-      if (!heroSection) return;
-      const heroRect = heroSection.getBoundingClientRect();
-      const heroH = heroRect.height;
-      // How far we've scrolled into the hero (0 = top visible, 1 = bottom at viewport top)
-      const scrollProgress = -heroRect.top / heroH;
-      // Start flying off when we've scrolled ~40% into hero, fully docked by ~85%
-      const shouldDock = scrollProgress > 0.85;
+    function animate(now) {
+      const elapsed = now - startTime;
 
-      if (shouldDock && !isDocked) {
+      /* --- scroll progress (0 = hero fully visible, 1 = hero scrolled away) --- */
+      let rawScroll = 0;
+      if (heroSection) {
+        const r = heroSection.getBoundingClientRect();
+        rawScroll = Math.max(0, Math.min(1, -r.top / (r.height * 0.55)));
+      }
+      // Smooth toward target
+      flyT += (rawScroll - flyT) * 0.07;
+
+      /* --- dock / undock --- */
+      if (flyT > 0.97 && !isDocked) {
         isDocked = true;
-        // Stagger each button flying to docked position
-        btns.forEach((btn, i) => {
-          setTimeout(() => {
-            btn.classList.add('flying');
-            btn.style.left = '';
-            btn.style.top = '';
-          }, i * 50);
-        });
         container.classList.remove('orbit-mode');
         container.classList.add('docked-mode');
         document.body.appendChild(container);
-        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 900);
-      } else if (!shouldDock && isDocked) {
-        isDocked = false;
-        btns.forEach((btn, i) => {
-          setTimeout(() => btn.classList.add('flying'), i * 50);
+        btns.forEach(btn => {
+          btn.style.left = '';
+          btn.style.top = '';
+          btn.style.transform = '';
+          btn.style.opacity = '';
+          btn.style.zIndex = '';
         });
+      } else if (flyT < 0.93 && isDocked) {
+        isDocked = false;
         container.classList.remove('docked-mode');
         container.classList.add('orbit-mode');
         wrapper.appendChild(container);
-        positionInOrbit();
-        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 900);
       }
+
+      /* --- update button positions while in orbit --- */
+      if (!isDocked) {
+        const wW = wrapper.offsetWidth;
+        const wH = wrapper.offsetHeight;
+        const cx = wW / 2;
+        const cy = wH / 2;
+        const btnW = btns[0] ? btns[0].offsetWidth / 2 : 18;
+        const btnH = btns[0] ? btns[0].offsetHeight / 2 : 18;
+
+        // Docked target: top-right of wrapper, spaced in a row
+        // (these are in wrapper-relative coords — will never actually be used
+        //  because we switch to CSS docked-mode, but we use them as fly targets)
+        const dockBaseX = wW + 60;
+        const dockY = -50;
+
+        btns.forEach((btn, i) => {
+          const baseAngle = (2 * Math.PI * i) / count;
+          const angle = baseAngle + SPEED * elapsed;
+
+          // Orbit position (ellipse)
+          const ox = cx + RADIUS_X * Math.cos(angle) - btnW;
+          const oy = cy + RADIUS_Y * Math.sin(angle) - btnH;
+
+          // Depth: sin(angle) → +1 = front, -1 = back
+          const depth = Math.sin(angle);
+          const scaleOrbit = SCALE_BACK + (SCALE_FRONT - SCALE_BACK) * (depth + 1) / 2;
+          const opacityOrbit = OPACITY_BACK + (OPACITY_FRONT - OPACITY_BACK) * (depth + 1) / 2;
+          const zOrbit = depth > 0 ? 3 : 0;
+
+          // Fly-out target (fly rightward staggered)
+          const flyX = dockBaseX + i * 44;
+          const flyY = dockY;
+
+          // Interpolate orbit → fly-out
+          const t = flyT;
+          const x = ox + (flyX - ox) * t;
+          const y = oy + (flyY - oy) * t;
+          const sc = scaleOrbit + (1 - scaleOrbit) * t;
+          const op = opacityOrbit + (1 - opacityOrbit) * t;
+
+          btn.style.left = x + 'px';
+          btn.style.top = y + 'px';
+          btn.style.transform = 'scale(' + sc.toFixed(3) + ')';
+          btn.style.opacity = op.toFixed(3);
+          btn.style.zIndex = depth > 0 ? 3 : 0;
+        });
+      }
+
+      requestAnimationFrame(animate);
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll(); // initial check
+    container.classList.add('orbit-mode');
+    requestAnimationFrame(animate);
   }
 
   if (document.readyState === 'loading') {
