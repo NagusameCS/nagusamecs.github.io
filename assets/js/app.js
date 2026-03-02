@@ -828,24 +828,26 @@ init();
       return;
     }
     const expect = KONAMI[seq];
-    // Match arrow keys by code, letter keys by key
-    const match =
-      (expect.startsWith('Arrow') && e.code === expect) ||
-      (expect === 'KeyB' && e.key.toLowerCase() === 'b') ||
-      (expect === 'KeyA' && e.key.toLowerCase() === 'a');
+    // Match by e.key for all keys (ArrowUp, ArrowDown, b, a, etc.)
+    const keyVal = e.key;
+    let match = false;
+    if (expect.startsWith('Arrow')) {
+      match = keyVal === expect;
+    } else if (expect === 'KeyB') {
+      match = keyVal.toLowerCase() === 'b';
+    } else if (expect === 'KeyA') {
+      match = keyVal.toLowerCase() === 'a';
+    }
 
     if (match) {
       seq++;
       if (seq === KONAMI.length) {
         seq = 0;
-        const avatar = document.getElementById('avatar');
-        if (avatar) {
-          const r = avatar.getBoundingClientRect();
-          if (r.top < window.innerHeight && r.bottom > 0) startAgar();
-        }
+        startAgar();
       }
     } else {
-      seq = (e.code === KONAMI[0]) ? 1 : 0;
+      // Check if this key restarts the sequence
+      seq = (keyVal === 'ArrowUp') ? 1 : 0;
     }
   });
 
