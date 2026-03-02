@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NagusameCS — Portfolio</title>
+  <meta name="description" content="Portfolio of NagusameCS — Software Developer">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-logo">NagusameCS</a>
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <i class="fas fa-bars"></i>
+      </button>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#repositories">Projects</a></li>
+        <li><a href="#collaborations">Collaborations</a></li>
+        <li><a href="#store-apps">Apps &amp; Extensions</a></li>
+        <li><a href="#activity">Activity</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <img id="avatar" src="" alt="Profile Picture" class="hero-avatar">
+      <h1 id="display-name">NagusameCS</h1>
+      <p id="bio" class="hero-bio"></p>
+      <div id="hero-meta" class="hero-meta">
+        <span id="company"><i class="fas fa-building"></i> <span></span></span>
+        <span id="location"><i class="fas fa-map-marker-alt"></i> <span></span></span>
+        <span id="blog"><i class="fas fa-globe"></i> <a href="" target="_blank"></a></span>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span id="stat-repos" class="stat-num">0</span><span class="stat-label">Repos</span></div>
+        <div class="stat"><span id="stat-followers" class="stat-num">0</span><span class="stat-label">Followers</span></div>
+        <div class="stat"><span id="stat-following" class="stat-num">0</span><span class="stat-label">Following</span></div>
+      </div>
+      <a href="https://github.com/NagusameCS" target="_blank" class="btn btn-primary">
+        <i class="fab fa-github"></i> View GitHub Profile
+      </a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about">
+    <div class="container">
+      <h2 class="section-title">About Me</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p id="about-bio">Loading profile...</p>
+          <div id="about-details" class="about-details"></div>
+        </div>
+        <div class="about-skills">
+          <h3>Top Languages</h3>
+          <div id="languages-chart" class="languages-chart"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Repositories Section -->
+  <section id="repositories">
+    <div class="container">
+      <h2 class="section-title">Projects</h2>
+      <div class="repo-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="source">Original</button>
+        <button class="filter-btn" data-filter="fork">Forked</button>
+      </div>
+      <div class="repo-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="repo-search" placeholder="Search projects...">
+      </div>
+      <div id="repo-grid" class="repo-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading repositories...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Repository Modal -->
+  <div id="repo-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <img id="modal-icon" class="modal-icon" src="" alt="">
+        <div>
+          <h2 id="modal-title"></h2>
+          <span id="modal-language" class="modal-language"></span>
+        </div>
+      </div>
+      <img id="modal-social-preview" class="modal-social-preview" src="" alt="Social Preview">
+      <p id="modal-description" class="modal-description"></p>
+      <div id="modal-stats" class="modal-stats"></div>
+      <div id="modal-topics" class="modal-topics"></div>
+      <div class="modal-actions">
+        <a id="modal-link" href="" target="_blank" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
+        <a id="modal-homepage" href="" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collaborations Section -->
+  <section id="collaborations">
+    <div class="container">
+      <h2 class="section-title">Collaborations</h2>
+      <div id="collab-grid" class="collab-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Store Apps Section -->
+  <section id="store-apps">
+    <div class="container">
+      <h2 class="section-title">Apps &amp; Extensions</h2>
+      <div id="store-grid" class="store-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activity Section -->
+  <section id="activity">
+    <div class="container">
+      <h2 class="section-title">GitHub Activity</h2>
+      <div id="contribution-graph" class="contribution-graph">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity...</div>
+      </div>
+      <div id="recent-activity" class="recent-activity">
+        <h3>Recent Activity</h3>
+        <ul id="activity-feed" class="activity-feed"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <div class="container">
+      <h2 class="section-title">Get In Touch</h2>
+      <div class="contact-content">
+        <p>Interested in collaborating or have a question? Feel free to reach out.</p>
+        <div class="contact-links">
+          <a href="mailto:nagusamecs@gmail.com" class="contact-card">
+            <i class="fas fa-envelope"></i>
+            <span>nagusamecs@gmail.com</span>
+          </a>
+          <a href="https://github.com/NagusameCS" target="_blank" class="contact-card">
+            <i class="fab fa-github"></i>
+            <span>NagusameCS</span>
+          </a>
+          <a href="https://ivystudy.org" target="_blank" class="contact-card">
+            <i class="fas fa-globe"></i>
+            <span>ivystudy.org</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="year"></span> NagusameCS. Built with vanilla JS — data sourced live from GitHub.</p>
+    </div>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

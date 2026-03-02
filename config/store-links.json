@@ -1,0 +1,26 @@
+{
+  "appStore": [
+    {
+      "name": "Example iOS App",
+      "url": "https://apps.apple.com/app/example/id1234567890",
+      "description": "An example iOS app listing.",
+      "icon": ""
+    }
+  ],
+  "playStore": [
+    {
+      "name": "Example Android App",
+      "url": "https://play.google.com/store/apps/details?id=com.example.app",
+      "description": "An example Android app listing.",
+      "icon": ""
+    }
+  ],
+  "vscodeMarketplace": [
+    {
+      "name": "Example VS Code Extension",
+      "url": "https://marketplace.visualstudio.com/items?itemName=publisher.extension",
+      "description": "An example VS Code extension listing.",
+      "icon": ""
+    }
+  ]
+}
