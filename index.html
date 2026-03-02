@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NagusameCS — Portfolio</title>
   <meta name="description" content="Portfolio of NagusameCS — Software Developer">
-  <link rel="icon" type="image/png" href="https://avatars.githubusercontent.com/u/150973942?v=4">
+  <link rel="icon" type="image/png" href="assets/avatar.png">
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
@@ -77,10 +77,10 @@
     </div>
   </section>
 
-  <!-- Skills Section -->
-  <section id="skills">
+  <!-- Skills & Experience Section -->
+  <section id="experience">
     <div class="container">
-      <h2 class="section-title">Skills &amp; Languages</h2>
+      <h2 class="section-title">Skills, Languages &amp; Experience</h2>
       <div class="skills-grid">
         <div class="skill-category">
           <h3><i class="fas fa-code"></i> Programming</h3>
@@ -140,14 +140,8 @@
           </div>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Experience Section -->
-  <section id="experience">
-    <div class="container">
-      <h2 class="section-title">Experience &amp; Leadership</h2>
-      <div class="timeline">
+      <div class="timeline" style="margin-top: 2.5rem;">
         <div class="timeline-item">
           <div class="timeline-icon"><i class="fas fa-school"></i></div>
           <div class="timeline-content">
@@ -198,6 +192,19 @@
   <section id="repositories">
     <div class="container">
       <h2 class="section-title"><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Highlighted Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></h2>
+
+      <!-- Featured Carousel -->
+      <div class="featured-carousel">
+        <button class="carousel-arrow carousel-arrow-left" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
+        <div class="carousel-track-wrapper">
+          <div id="carousel-track" class="carousel-track">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+        <button class="carousel-arrow carousel-arrow-right" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+        <div class="carousel-dots" id="carousel-dots"></div>
+      </div>
+
       <div class="repo-controls">
         <div class="repo-filters">
           <button class="filter-btn active" data-filter="all">All</button>

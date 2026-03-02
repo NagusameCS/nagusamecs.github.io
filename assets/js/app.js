@@ -69,8 +69,8 @@ async function fetchJSONSafe(url, fallback = null) {
 async function loadProfile() {
   const profile = await fetchJSON(`${GH_API}/users/${GH_USER}`);
 
-  // Avatar
-  document.getElementById('avatar').src = profile.avatar_url;
+  // Avatar — use local copy for faster loading
+  document.getElementById('avatar').src = 'assets/avatar.png';
 
   // Name
   const displayName = profile.name || profile.login;
@@ -143,6 +143,7 @@ async function loadRepos() {
   allRepos = repos.filter(r => !ignoredSet.has(r.name.toLowerCase()));
 
   renderRepos(allRepos);
+  renderFeaturedCarousel(allRepos);
   computeLanguages(allRepos);
 }
 
@@ -165,8 +166,9 @@ function renderRepos(repos) {
       : '';
 
     const letter = (repo.name.charAt(0) || '?').toUpperCase();
+    const heatmapClass = repo.name === 'HEATMAP' ? ' heatmap-icon-bg' : '';
     const iconHtml = overrideIcon
-      ? `<img class="repo-card-icon" src="${overrideIcon}" alt="" onerror="repoIconFallback(this)">`
+      ? `<img class="repo-card-icon${heatmapClass}" src="${overrideIcon}" alt="" onerror="repoIconFallback(this)">`
       : `<div class="repo-card-icon-placeholder">${letter}</div>`;
 
     return `
@@ -197,6 +199,94 @@ function renderRepos(repos) {
   // Card click => modal
   grid.querySelectorAll('.repo-card').forEach(card => {
     card.addEventListener('click', () => openRepoModal(allRepos[parseInt(card.dataset.index)]));
+  });
+}
+
+// ===== FEATURED CAROUSEL =====
+const FEATURED_REPOS = ['TensorOS', 'Pseudocode', 'IVY', 'HEATMAP'];
+
+function renderFeaturedCarousel(repos) {
+  const track = document.getElementById('carousel-track');
+  const dotsContainer = document.getElementById('carousel-dots');
+  if (!track || !dotsContainer) return;
+
+  const featured = FEATURED_REPOS
+    .map(name => repos.find(r => r.name === name))
+    .filter(Boolean);
+
+  if (featured.length === 0) {
+    document.querySelector('.featured-carousel').style.display = 'none';
+    return;
+  }
+
+  track.innerHTML = featured.map((repo, i) => {
+    const overrideIcon = ICON_OVERRIDES[repo.name];
+    const langColor = LANG_COLORS[repo.language] || '#8b949e';
+    const heatmapClass = repo.name === 'HEATMAP' ? ' heatmap-icon-bg' : '';
+    const letter = (repo.name.charAt(0) || '?').toUpperCase();
+    const iconHtml = overrideIcon
+      ? `<img class="carousel-card-icon${heatmapClass}" src="${overrideIcon}" alt="">`
+      : `<div class="repo-card-icon-placeholder" style="width:64px;height:64px;font-size:1.4rem;">${letter}</div>`;
+
+    return `
+      <div class="carousel-slide" data-index="${i}">
+        <div class="carousel-card" data-repo="${repo.name}">
+          ${iconHtml}
+          <div class="carousel-card-body">
+            <h3>${escapeHtml(repo.name)}</h3>
+            <p>${escapeHtml(repo.description) || 'No description provided.'}</p>
+            <div class="carousel-card-meta">
+              ${repo.language ? `<span><span class="lang-dot" style="background:${langColor}"></span>${repo.language}</span>` : ''}
+              <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
+              <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Dots
+  dotsContainer.innerHTML = featured.map((_, i) =>
+    `<button class="carousel-dot${i === 0 ? ' active' : ''}" data-slide="${i}" aria-label="Slide ${i + 1}"></button>`
+  ).join('');
+
+  let current = 0;
+  const total = featured.length;
+
+  function goTo(idx) {
+    current = ((idx % total) + total) % total;
+    track.style.transform = `translateX(-${current * 100}%)`;
+    dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  document.querySelector('.carousel-arrow-left').addEventListener('click', () => goTo(current - 1));
+  document.querySelector('.carousel-arrow-right').addEventListener('click', () => goTo(current + 1));
+  dotsContainer.querySelectorAll('.carousel-dot').forEach(dot => {
+    dot.addEventListener('click', () => goTo(parseInt(dot.dataset.slide)));
+  });
+
+  // Click card => open modal
+  track.querySelectorAll('.carousel-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const repo = allRepos.find(r => r.name === card.dataset.repo);
+      if (repo) openRepoModal(repo);
+    });
+  });
+
+  // Auto-advance every 5 seconds
+  let autoTimer = setInterval(() => goTo(current + 1), 5000);
+  const carousel = document.querySelector('.featured-carousel');
+  carousel.addEventListener('mouseenter', () => clearInterval(autoTimer));
+  carousel.addEventListener('mouseleave', () => {
+    autoTimer = setInterval(() => goTo(current + 1), 5000);
+  });
+
+  // Swipe support
+  let touchStartX = 0;
+  track.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  track.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
   });
 }
 
@@ -239,9 +329,11 @@ function openRepoModal(repo) {
   if (overrideIcon) {
     iconEl.src = overrideIcon;
     iconEl.style.display = 'block';
+    iconEl.className = repo.name === 'HEATMAP' ? 'modal-icon heatmap-icon-bg' : 'modal-icon';
     iconEl.onerror = function () { this.style.display = 'none'; };
   } else {
     iconEl.style.display = 'none';
+    iconEl.className = 'modal-icon';
   }
 
   // Social preview — try multiple custom paths, then hide if none found
@@ -364,16 +456,10 @@ async function loadModalReadme(repo) {
     if (!res.ok) throw new Error('No README');
     const md = await res.text();
 
-    // Configure marked with GitHub-flavored markdown + syntax highlighting
+    // Configure marked with GitHub-flavored markdown
     marked.setOptions({
       gfm: true,
       breaks: true,
-      highlight: function (code, lang) {
-        if (lang && hljs.getLanguage(lang)) {
-          try { return hljs.highlight(code, { language: lang }).value; } catch {}
-        }
-        return hljs.highlightAuto(code).value;
-      },
     });
 
     // Fix relative image/link URLs to point to the repo's raw content
@@ -383,12 +469,16 @@ async function loadModalReadme(repo) {
     const renderer = new marked.Renderer();
 
     // Rewrite relative image src to raw.githubusercontent
-    renderer.image = function (href, title, text) {
-      // marked v12 may pass an object as first arg
-      if (typeof href === 'object') {
-        text = href.text || '';
-        title = href.title || '';
-        href = href.href || '';
+    renderer.image = function (token) {
+      let href, title, text;
+      if (typeof token === 'object' && token !== null) {
+        href = token.href || '';
+        title = token.title || '';
+        text = token.text || '';
+      } else {
+        href = token || '';
+        title = arguments[1] || '';
+        text = arguments[2] || '';
       }
       if (href && !href.startsWith('http') && !href.startsWith('data:')) {
         href = baseRaw + href.replace(/^\.\//, '');
@@ -398,11 +488,16 @@ async function loadModalReadme(repo) {
     };
 
     // Rewrite relative link href to GitHub blob
-    renderer.link = function (href, title, text) {
-      if (typeof href === 'object') {
-        text = href.text || '';
-        title = href.title || '';
-        href = href.href || '';
+    renderer.link = function (token) {
+      let href, title, text;
+      if (typeof token === 'object' && token !== null) {
+        href = token.href || '';
+        title = token.title || '';
+        text = token.text || '';
+      } else {
+        href = token || '';
+        title = arguments[1] || '';
+        text = arguments[2] || '';
       }
       if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
         href = baseRepo + href.replace(/^\.\//, '');
@@ -412,15 +507,21 @@ async function loadModalReadme(repo) {
     };
 
     // Checkbox list items (GitHub task lists)
-    renderer.listitem = function (text) {
-      if (typeof text === 'object') text = text.text || '';
-      if (text.startsWith('<input')) {
+    renderer.listitem = function (token) {
+      let text;
+      if (typeof token === 'object' && token !== null) {
+        text = token.text || '';
+      } else {
+        text = token || '';
+      }
+      if (typeof text === 'string' && text.startsWith('<input')) {
         return `<li class="task-list-item">${text}</li>\n`;
       }
       return `<li>${text}</li>\n`;
     };
 
-    const html = marked.parse(md, { renderer });
+    marked.use({ renderer });
+    const html = marked.parse(md);
     el.innerHTML = `<div class="markdown-body">${html}</div>`;
 
     // Apply syntax highlighting to any code blocks that weren't caught
