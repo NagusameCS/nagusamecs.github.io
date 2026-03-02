@@ -813,43 +813,48 @@ async function init() {
 
 init();
 
-// ===== KONAMI CODE EASTER EGG — AGAR.IO MODE =====
+// ===== LONG-PRESS EASTER EGG — AGAR.IO MODE =====
 (function () {
-  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
-  let seq = 0;
   let active = false;
+  let holdTimer = null;
+  const HOLD_MS = 1500; // hold for 1.5 seconds
 
   // State
   let blob, hud, blobSize, blobX, blobY, targetX, targetY, frame, food, eaten, scrollY0;
 
-  document.addEventListener('keydown', (e) => {
-    if (active) {
-      if (e.key === 'Escape') stopAgar();
-      return;
+  // Activate on long-press of the avatar
+  function attachTrigger() {
+    const avatar = document.getElementById('avatar');
+    if (!avatar) return;
+
+    function startHold(e) {
+      if (active) return;
+      e.preventDefault();
+      holdTimer = setTimeout(() => startAgar(), HOLD_MS);
     }
-    const expect = KONAMI[seq];
-    // Match by e.key for all keys (ArrowUp, ArrowDown, b, a, etc.)
-    const keyVal = e.key;
-    let match = false;
-    if (expect.startsWith('Arrow')) {
-      match = keyVal === expect;
-    } else if (expect === 'KeyB') {
-      match = keyVal.toLowerCase() === 'b';
-    } else if (expect === 'KeyA') {
-      match = keyVal.toLowerCase() === 'a';
+    function cancelHold() {
+      clearTimeout(holdTimer);
     }
 
-    if (match) {
-      seq++;
-      if (seq === KONAMI.length) {
-        seq = 0;
-        startAgar();
-      }
-    } else {
-      // Check if this key restarts the sequence
-      seq = (keyVal === 'ArrowUp') ? 1 : 0;
-    }
+    avatar.addEventListener('mousedown', startHold);
+    avatar.addEventListener('touchstart', startHold, { passive: false });
+    avatar.addEventListener('mouseup', cancelHold);
+    avatar.addEventListener('mouseleave', cancelHold);
+    avatar.addEventListener('touchend', cancelHold);
+    avatar.addEventListener('touchcancel', cancelHold);
+  }
+
+  // Also listen for ESC to exit
+  document.addEventListener('keydown', (e) => {
+    if (active && e.key === 'Escape') stopAgar();
   });
+
+  // Attach once DOM is ready (avatar is populated by loadProfile)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(attachTrigger, 500));
+  } else {
+    setTimeout(attachTrigger, 500);
+  }
 
   function startAgar() {
     if (active) return;
