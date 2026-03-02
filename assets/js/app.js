@@ -618,73 +618,128 @@ async function loadActivity() {
 async function renderContributionGraph() {
   const container = document.getElementById('contribution-graph');
   try {
-    let allEvents = [];
-    for (let p = 1; p <= 3; p++) {
-      const events = await fetchJSONSafe(`${GH_API}/users/${GH_USER}/events/public?per_page=100&page=${p}`, []);
-      allEvents = allEvents.concat(events);
-      if (events.length < 100) break;
-    }
+    // Use public contributions API for full year of data
+    const data = await fetchJSON(`https://github-contributions-api.jogruber.de/v4/${GH_USER}?y=last`);
+    const contributions = data.contributions || [];
 
-    // Count events per day for last 90 days
-    const dayCounts = {};
-    allEvents.forEach(ev => {
-      const day = ev.created_at.split('T')[0];
-      dayCounts[day] = (dayCounts[day] || 0) + 1;
+    // Flatten all days into a map
+    const dayMap = {};
+    contributions.forEach(day => {
+      dayMap[day.date] = day.count;
     });
 
+    // Build full year of days (52 weeks + current partial week)
     const today = new Date();
     const days = [];
-    for (let i = 89; i >= 0; i--) {
+    for (let i = 364; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
-      days.push({ date: dateStr, count: dayCounts[dateStr] || 0, day: d });
+      days.push({ date: dateStr, count: dayMap[dateStr] || 0, day: d });
     }
 
     const maxCount = Math.max(...days.map(d => d.count), 1);
-    const totalEvents = days.reduce((s, d) => s + d.count, 0);
+    const totalContributions = days.reduce((s, d) => s + d.count, 0);
     const activeDays = days.filter(d => d.count > 0).length;
+    const currentStreak = computeStreak(days);
 
-    // Build SVG pulse bar chart
-    const barW = 7;
-    const gap = 2;
-    const svgW = days.length * (barW + gap);
-    const svgH = 100;
+    // GitHub-style heatmap calendar
+    const cellSize = 11;
+    const cellGap = 2;
+    const cellStep = cellSize + cellGap;
 
-    const bars = days.map((d, i) => {
-      const x = i * (barW + gap);
-      if (d.count === 0) return '';
-      const h = Math.max(3, (d.count / maxCount) * svgH);
-      const y = svgH - h;
-      const op = (0.35 + (d.count / maxCount) * 0.65).toFixed(2);
-      return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="1.5" fill="#fff" opacity="${op}"><title>${d.date}: ${d.count} event${d.count > 1 ? 's' : ''}</title></rect>`;
+    // Organize days into weeks (columns) and weekdays (rows)
+    // First day should align to its weekday row
+    const firstDow = days[0].day.getDay(); // 0=Sun
+    const weeks = [];
+    let currentWeek = new Array(7).fill(null);
+    // Fill in leading nulls
+    for (let i = 0; i < firstDow; i++) currentWeek[i] = null;
+    
+    days.forEach((d, idx) => {
+      const dow = d.day.getDay();
+      currentWeek[dow] = d;
+      if (dow === 6 || idx === days.length - 1) {
+        weeks.push(currentWeek);
+        currentWeek = new Array(7).fill(null);
+      }
+    });
+
+    const numWeeks = weeks.length;
+    const dayLabelsW = 28;
+    const svgW = dayLabelsW + numWeeks * cellStep;
+    const svgH = 7 * cellStep + 24; // +24 for month labels on top
+    const gridTop = 18; // offset for month labels
+
+    // Intensity levels (GitHub-style)
+    function getCellColor(count) {
+      if (count === 0) return '#161b22';
+      const ratio = count / maxCount;
+      if (ratio <= 0.25) return 'rgba(255,255,255,0.15)';
+      if (ratio <= 0.50) return 'rgba(255,255,255,0.30)';
+      if (ratio <= 0.75) return 'rgba(255,255,255,0.55)';
+      return 'rgba(255,255,255,0.85)';
+    }
+
+    // Build cells
+    let cells = '';
+    weeks.forEach((week, wi) => {
+      week.forEach((d, di) => {
+        if (!d) return;
+        const x = dayLabelsW + wi * cellStep;
+        const y = gridTop + di * cellStep;
+        const color = getCellColor(d.count);
+        cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${color}" data-date="${d.date}" data-count="${d.count}"><title>${d.date}: ${d.count} contribution${d.count !== 1 ? 's' : ''}</title></rect>`;
+      });
+    });
+
+    // Day-of-week labels (Mon, Wed, Fri)
+    const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
+    const dayLabelsSvg = dayLabels.map((label, i) => {
+      if (!label) return '';
+      const y = gridTop + i * cellStep + cellSize - 1;
+      return `<text x="0" y="${y}" fill="#666" font-size="9" font-family="inherit">${label}</text>`;
     }).join('');
 
-    // Month labels below the bars
-    const months = [];
-    let lastM = -1;
-    days.forEach((d, i) => {
-      const m = d.day.getMonth();
-      if (m !== lastM) {
-        lastM = m;
-        months.push(`<text x="${i * (barW + gap)}" y="${svgH + 14}" fill="#666" font-size="10" font-family="inherit">${d.day.toLocaleDateString('en-US', { month: 'short' })}</text>`);
+    // Month labels on top
+    let monthLabels = '';
+    let lastMonth = -1;
+    weeks.forEach((week, wi) => {
+      // Find the first non-null day in this week
+      const firstDay = week.find(d => d !== null);
+      if (!firstDay) return;
+      const m = firstDay.day.getMonth();
+      if (m !== lastMonth) {
+        lastMonth = m;
+        const x = dayLabelsW + wi * cellStep;
+        monthLabels += `<text x="${x}" y="10" fill="#666" font-size="9" font-family="inherit">${firstDay.day.toLocaleDateString('en-US', { month: 'short' })}</text>`;
       }
     });
 
     container.innerHTML = `
       <div class="pulse-header">
         <div class="pulse-stats">
-          <span><strong>${totalEvents}</strong> events</span>
+          <span><strong>${totalContributions.toLocaleString()}</strong> contributions</span>
           <span><strong>${activeDays}</strong> active days</span>
+          ${currentStreak > 0 ? `<span><strong>${currentStreak}</strong> day streak</span>` : ''}
         </div>
-        <span class="pulse-period">Last 90 days</span>
+        <span class="pulse-period">Last 365 days</span>
       </div>
-      <div class="pulse-chart">
-        <svg width="100%" height="${svgH + 20}" viewBox="0 0 ${svgW} ${svgH + 20}" preserveAspectRatio="none">
-          <line x1="0" y1="${svgH}" x2="${svgW}" y2="${svgH}" stroke="#222" stroke-width="1"/>
-          ${bars}
-          ${months.join('')}
+      <div class="heatmap-chart">
+        <svg width="100%" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMinYMid meet">
+          ${monthLabels}
+          ${dayLabelsSvg}
+          ${cells}
         </svg>
+      </div>
+      <div class="heatmap-legend">
+        <span class="heatmap-legend-label">Less</span>
+        <span class="heatmap-legend-cell" style="background:#161b22"></span>
+        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.15)"></span>
+        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.30)"></span>
+        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.55)"></span>
+        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.85)"></span>
+        <span class="heatmap-legend-label">More</span>
       </div>
     `;
   } catch (e) {
@@ -692,10 +747,26 @@ async function renderContributionGraph() {
   }
 }
 
+function computeStreak(days) {
+  let streak = 0;
+  for (let i = days.length - 1; i >= 0; i--) {
+    if (days[i].count > 0) streak++;
+    else break;
+  }
+  return streak;
+}
+
 async function loadRecentActivity() {
   const feed = document.getElementById('activity-feed');
   try {
-    const events = await fetchJSON(`${GH_API}/users/${GH_USER}/events/public?per_page=30`);
+    // Fetch all available event pages (GitHub keeps up to 10 pages of 100)
+    let allEvents = [];
+    for (let p = 1; p <= 10; p++) {
+      const batch = await fetchJSONSafe(`${GH_API}/users/${GH_USER}/events/public?per_page=100&page=${p}`, []);
+      allEvents = allEvents.concat(batch);
+      if (batch.length < 100) break;
+    }
+    const events = allEvents;
 
     const eventIcons = {
       PushEvent: 'fas fa-code-commit',
@@ -748,21 +819,33 @@ async function loadRecentActivity() {
 
     const items = events
       .map(ev => ({ ev, desc: describeEvent(ev) }))
-      .filter(({ desc }) => desc !== null)
-      .slice(0, 10);
+      .filter(({ desc }) => desc !== null);
 
     if (items.length === 0) {
       feed.innerHTML = '<li class="activity-item"><span class="activity-text" style="color:var(--text-muted)">No recent activity.</span></li>';
       return;
     }
 
-    feed.innerHTML = items.map(({ ev, desc }) => `
-      <li class="activity-item">
-        <i class="${eventIcons[ev.type] || 'fas fa-bolt'}"></i>
-        <span class="activity-text">${desc}</span>
-        <span class="activity-time">${timeAgo(ev.created_at)}</span>
-      </li>
-    `).join('');
+    // Show initial batch, with "Show More" button if there are more
+    const INITIAL_COUNT = 15;
+    const showItems = (count) => {
+      const visible = items.slice(0, count);
+      feed.innerHTML = visible.map(({ ev, desc }) => `
+        <li class="activity-item">
+          <i class="${eventIcons[ev.type] || 'fas fa-bolt'}"></i>
+          <span class="activity-text">${desc}</span>
+          <span class="activity-time">${timeAgo(ev.created_at)}</span>
+        </li>
+      `).join('');
+      if (count < items.length) {
+        const more = document.createElement('li');
+        more.className = 'activity-show-more';
+        more.innerHTML = `<button class="btn btn-secondary" style="width:100%;justify-content:center;">Show more (${items.length - count} remaining)</button>`;
+        more.querySelector('button').addEventListener('click', () => showItems(count + 30));
+        feed.appendChild(more);
+      }
+    };
+    showItems(INITIAL_COUNT);
   } catch {
     feed.innerHTML = '<li class="activity-item"><span class="activity-text" style="color:var(--text-muted)">Could not load recent activity.</span></li>';
   }

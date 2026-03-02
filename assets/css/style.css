@@ -1234,11 +1234,14 @@ section {
   align-items: center;
   margin-bottom: 16px;
   font-size: 0.85rem;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .pulse-stats {
   display: flex;
   gap: 20px;
   color: var(--text-secondary);
+  flex-wrap: wrap;
 }
 .pulse-stats strong {
   color: var(--text-primary);
@@ -1247,6 +1250,41 @@ section {
   color: var(--text-muted);
   font-size: 0.8rem;
 }
+
+/* Heatmap calendar */
+.heatmap-chart {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+.heatmap-chart svg {
+  display: block;
+  min-width: 720px;
+}
+.heatmap-chart rect {
+  outline: 1px solid rgba(255,255,255,0.03);
+  outline-offset: -0.5px;
+}
+.heatmap-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.heatmap-legend-label {
+  margin: 0 3px;
+}
+.heatmap-legend-cell {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* Keep old pulse chart styles for fallback */
 .pulse-chart {
   width: 100%;
   overflow-x: auto;
@@ -1254,6 +1292,11 @@ section {
 .pulse-chart svg {
   display: block;
   min-width: 100%;
+}
+
+.activity-show-more {
+  list-style: none;
+  margin-top: 4px;
 }
 
 .recent-activity h3 {
