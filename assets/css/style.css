@@ -1615,13 +1615,14 @@ section {
   transition: none;
 }
 
-/* DOCKED MODE — fixed row below nav header */
+/* DOCKED MODE — fixed vertical column below nav */
 .hero-socials.docked-mode {
   position: fixed;
   top: 64px;
   right: 20px;
   z-index: 999;
   display: flex;
+  flex-direction: column;
   gap: 8px;
 }
 .hero-socials.docked-mode .social-btn {
