@@ -719,17 +719,12 @@ async function loadActivity() {
 async function renderContributionGraph() {
   const container = document.getElementById('contribution-graph');
   try {
-    // Use public contributions API for full year of data
     const data = await fetchJSON(`https://github-contributions-api.jogruber.de/v4/${GH_USER}?y=last`);
     const contributions = data.contributions || [];
 
-    // Flatten all days into a map
     const dayMap = {};
-    contributions.forEach(day => {
-      dayMap[day.date] = day.count;
-    });
+    contributions.forEach(day => { dayMap[day.date] = day.count; });
 
-    // Build full year of days (52 weeks + current partial week)
     const today = new Date();
     const days = [];
     for (let i = 364; i >= 0; i--) {
@@ -744,19 +739,17 @@ async function renderContributionGraph() {
     const activeDays = days.filter(d => d.count > 0).length;
     const currentStreak = computeStreak(days);
 
-    // GitHub-style heatmap calendar
+    // Best day
+    const bestDay = days.reduce((best, d) => d.count > best.count ? d : best, days[0]);
+
     const cellSize = 11;
     const cellGap = 2;
     const cellStep = cellSize + cellGap;
 
-    // Organize days into weeks (columns) and weekdays (rows)
-    // First day should align to its weekday row
-    const firstDow = days[0].day.getDay(); // 0=Sun
+    const firstDow = days[0].day.getDay();
     const weeks = [];
     let currentWeek = new Array(7).fill(null);
-    // Fill in leading nulls
     for (let i = 0; i < firstDow; i++) currentWeek[i] = null;
-    
     days.forEach((d, idx) => {
       const dow = d.day.getDay();
       currentWeek[dow] = d;
@@ -769,62 +762,72 @@ async function renderContributionGraph() {
     const numWeeks = weeks.length;
     const dayLabelsW = 28;
     const svgW = dayLabelsW + numWeeks * cellStep;
-    const svgH = 7 * cellStep + 24; // +24 for month labels on top
-    const gridTop = 18; // offset for month labels
+    const svgH = 7 * cellStep + 24;
+    const gridTop = 18;
 
-    // Intensity levels (GitHub-style)
-    function getCellColor(count) {
-      if (count === 0) return '#161b22';
+    // Green-tinted intensity scale (GitHub-style but monochrome-friendly)
+    const LEVELS = [
+      '#161b22',           // 0 — empty
+      '#0e4429',           // 1 — low
+      '#006d32',           // 2 — medium-low
+      '#26a641',           // 3 — medium-high
+      '#39d353',           // 4 — high
+    ];
+    function getCellLevel(count) {
+      if (count === 0) return 0;
       const ratio = count / maxCount;
-      if (ratio <= 0.25) return 'rgba(255,255,255,0.15)';
-      if (ratio <= 0.50) return 'rgba(255,255,255,0.30)';
-      if (ratio <= 0.75) return 'rgba(255,255,255,0.55)';
-      return 'rgba(255,255,255,0.85)';
+      if (ratio <= 0.25) return 1;
+      if (ratio <= 0.50) return 2;
+      if (ratio <= 0.75) return 3;
+      return 4;
     }
 
-    // Build cells
     let cells = '';
     weeks.forEach((week, wi) => {
       week.forEach((d, di) => {
         if (!d) return;
         const x = dayLabelsW + wi * cellStep;
         const y = gridTop + di * cellStep;
-        const color = getCellColor(d.count);
-        cells += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="2" fill="${color}" data-date="${d.date}" data-count="${d.count}"><title>${d.date}: ${d.count} contribution${d.count !== 1 ? 's' : ''}</title></rect>`;
+        const level = getCellLevel(d.count);
+        cells += `<rect class="heatmap-cell" x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" fill="${LEVELS[level]}" data-date="${d.date}" data-count="${d.count}" data-level="${level}"/>`;
       });
     });
 
-    // Day-of-week labels (Mon, Wed, Fri)
     const dayLabels = ['', 'Mon', '', 'Wed', '', 'Fri', ''];
     const dayLabelsSvg = dayLabels.map((label, i) => {
       if (!label) return '';
       const y = gridTop + i * cellStep + cellSize - 1;
-      return `<text x="0" y="${y}" fill="#666" font-size="9" font-family="inherit">${label}</text>`;
+      return `<text x="0" y="${y}" fill="#484f58" font-size="9" font-family="-apple-system,BlinkMacSystemFont,sans-serif">${label}</text>`;
     }).join('');
 
-    // Month labels on top
     let monthLabels = '';
     let lastMonth = -1;
     weeks.forEach((week, wi) => {
-      // Find the first non-null day in this week
       const firstDay = week.find(d => d !== null);
       if (!firstDay) return;
       const m = firstDay.day.getMonth();
       if (m !== lastMonth) {
         lastMonth = m;
         const x = dayLabelsW + wi * cellStep;
-        monthLabels += `<text x="${x}" y="10" fill="#666" font-size="9" font-family="inherit">${firstDay.day.toLocaleDateString('en-US', { month: 'short' })}</text>`;
+        monthLabels += `<text x="${x}" y="10" fill="#484f58" font-size="9" font-family="-apple-system,BlinkMacSystemFont,sans-serif">${firstDay.day.toLocaleDateString('en-US', { month: 'short' })}</text>`;
       }
     });
 
     container.innerHTML = `
-      <div class="pulse-header">
-        <div class="pulse-stats">
-          <span><strong>${totalContributions.toLocaleString()}</strong> contributions</span>
-          <span><strong>${activeDays}</strong> active days</span>
-          ${currentStreak > 0 ? `<span><strong>${currentStreak}</strong> day streak</span>` : ''}
+      <div class="graph-header">
+        <div class="graph-stat-group">
+          <div class="graph-stat">
+            <span class="graph-stat-value">${totalContributions.toLocaleString()}</span>
+            <span class="graph-stat-label">contributions</span>
+          </div>
+          <div class="graph-stat">
+            <span class="graph-stat-value">${activeDays}</span>
+            <span class="graph-stat-label">active days</span>
+          </div>
+          ${currentStreak > 0 ? `<div class="graph-stat"><span class="graph-stat-value">${currentStreak}</span><span class="graph-stat-label">day streak</span></div>` : ''}
+          ${bestDay.count > 0 ? `<div class="graph-stat"><span class="graph-stat-value">${bestDay.count}</span><span class="graph-stat-label">best day</span></div>` : ''}
         </div>
-        <span class="pulse-period">Last 365 days</span>
+        <span class="graph-period">Last 365 days</span>
       </div>
       <div class="heatmap-chart">
         <svg width="100%" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMinYMid meet">
@@ -833,16 +836,41 @@ async function renderContributionGraph() {
           ${cells}
         </svg>
       </div>
-      <div class="heatmap-legend">
-        <span class="heatmap-legend-label">Less</span>
-        <span class="heatmap-legend-cell" style="background:#161b22"></span>
-        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.15)"></span>
-        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.30)"></span>
-        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.55)"></span>
-        <span class="heatmap-legend-cell" style="background:rgba(255,255,255,0.85)"></span>
-        <span class="heatmap-legend-label">More</span>
+      <div class="heatmap-footer">
+        <a href="https://github.com/${GH_USER}" target="_blank" class="heatmap-link">View full profile on GitHub &rarr;</a>
+        <div class="heatmap-legend">
+          <span class="heatmap-legend-label">Less</span>
+          ${LEVELS.map(c => `<span class="heatmap-legend-cell" style="background:${c}"></span>`).join('')}
+          <span class="heatmap-legend-label">More</span>
+        </div>
       </div>
     `;
+
+    // Interactive tooltip
+    const tooltip = document.createElement('div');
+    tooltip.className = 'heatmap-tooltip';
+    document.body.appendChild(tooltip);
+
+    const svg = container.querySelector('.heatmap-chart svg');
+    svg.addEventListener('mouseover', (e) => {
+      const rect = e.target.closest('.heatmap-cell');
+      if (!rect) return;
+      const count = parseInt(rect.dataset.count);
+      const dateStr = rect.dataset.date;
+      const dateObj = new Date(dateStr + 'T12:00:00');
+      const formatted = dateObj.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+      tooltip.innerHTML = `<strong>${count} contribution${count !== 1 ? 's' : ''}</strong><span class="tooltip-date">${formatted}</span>`;
+      tooltip.classList.add('visible');
+    });
+    svg.addEventListener('mousemove', (e) => {
+      tooltip.style.left = (e.clientX + 12) + 'px';
+      tooltip.style.top = (e.clientY - 36) + 'px';
+    });
+    svg.addEventListener('mouseout', (e) => {
+      if (e.target.classList?.contains('heatmap-cell')) {
+        tooltip.classList.remove('visible');
+      }
+    });
   } catch (e) {
     container.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:2rem;">Could not load activity data.</p>`;
   }
@@ -1083,6 +1111,79 @@ async function init() {
 }
 
 init();
+
+// ===== ORBITING SOCIAL BUTTONS =====
+(function () {
+  function initOrbitSocials() {
+    const container = document.getElementById('hero-socials');
+    if (!container) return;
+    const btns = Array.from(container.querySelectorAll('.social-btn'));
+    const count = btns.length;
+    const wrapper = container.closest('.avatar-orbit-wrapper');
+    if (!wrapper) return;
+
+    // Position buttons in a circle around the avatar
+    function positionInOrbit() {
+      const wW = wrapper.offsetWidth;
+      const wH = wrapper.offsetHeight;
+      const radius = Math.max(wW, wH) / 2 + 14; // slightly outside the avatar
+      btns.forEach((btn, i) => {
+        const angle = (2 * Math.PI * i) / count - Math.PI / 2;
+        const cx = wW / 2 + radius * Math.cos(angle) - btn.offsetWidth / 2;
+        const cy = wH / 2 + radius * Math.sin(angle) - btn.offsetHeight / 2;
+        btn.style.left = cx + 'px';
+        btn.style.top = cy + 'px';
+      });
+    }
+
+    positionInOrbit();
+    window.addEventListener('resize', () => {
+      if (container.classList.contains('orbit-mode')) positionInOrbit();
+    });
+
+    // Scroll handler — orbit → docked transition
+    const heroSection = document.getElementById('hero');
+    let isDocked = false;
+
+    function onScroll() {
+      if (!heroSection) return;
+      const heroBottom = heroSection.getBoundingClientRect().bottom;
+      const shouldDock = heroBottom < 80;
+
+      if (shouldDock && !isDocked) {
+        isDocked = true;
+        // Add flying class for smooth transition
+        btns.forEach(btn => {
+          btn.classList.add('flying');
+          btn.style.left = '';
+          btn.style.top = '';
+        });
+        container.classList.remove('orbit-mode');
+        container.classList.add('docked-mode');
+        // Remove from wrapper so it stays fixed
+        document.body.appendChild(container);
+        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 700);
+      } else if (!shouldDock && isDocked) {
+        isDocked = false;
+        btns.forEach(btn => btn.classList.add('flying'));
+        container.classList.remove('docked-mode');
+        container.classList.add('orbit-mode');
+        wrapper.appendChild(container);
+        positionInOrbit();
+        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 700);
+      }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // initial check
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initOrbitSocials, 600));
+  } else {
+    setTimeout(initOrbitSocials, 600);
+  }
+})();
 
 // ===== LONG-PRESS EASTER EGG — AGAR.IO MODE =====
 (function () {

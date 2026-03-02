@@ -341,9 +341,23 @@ section {
 
 /* ===== SKILLS ===== */
 #skills { background: var(--bg-secondary); }
+.skills-experience-row {
+  display: flex;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+.skills-experience-row > .skills-grid {
+  flex: 1.3;
+  min-width: 0;
+}
+.skills-experience-row > .timeline {
+  flex: 0.7;
+  min-width: 260px;
+  margin-top: 0;
+}
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
 .skill-category {
@@ -1355,34 +1369,48 @@ section {
 
 /* ===== ACTIVITY ===== */
 .contribution-graph {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 20px;
+  padding: 24px;
   margin-bottom: 2rem;
-  overflow-x: auto;
+  overflow: hidden;
 }
-.pulse-header {
+
+/* Stats header */
+.graph-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  font-size: 0.85rem;
+  align-items: baseline;
+  margin-bottom: 18px;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
-.pulse-stats {
+.graph-stat-group {
   display: flex;
-  gap: 20px;
-  color: var(--text-secondary);
+  gap: 24px;
   flex-wrap: wrap;
 }
-.pulse-stats strong {
-  color: var(--text-primary);
+.graph-stat {
+  display: flex;
+  flex-direction: column;
 }
-.pulse-period {
+.graph-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.graph-stat-label {
+  font-size: 0.7rem;
   color: var(--text-muted);
-  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.graph-period {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
 }
 
 /* Heatmap calendar */
@@ -1390,42 +1418,91 @@ section {
   width: 100%;
   overflow-x: auto;
   padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
 }
+.heatmap-chart::-webkit-scrollbar { height: 4px; }
+.heatmap-chart::-webkit-scrollbar-track { background: transparent; }
+.heatmap-chart::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 .heatmap-chart svg {
   display: block;
   min-width: 720px;
 }
-.heatmap-chart rect {
-  outline: 1px solid rgba(255,255,255,0.03);
-  outline-offset: -0.5px;
+.heatmap-chart rect.heatmap-cell {
+  rx: 2;
+  ry: 2;
+  stroke: rgba(255,255,255,0.04);
+  stroke-width: 1;
+  cursor: pointer;
+  transition: stroke 0.15s ease;
+}
+.heatmap-chart rect.heatmap-cell:hover {
+  stroke: rgba(255,255,255,0.25);
+  stroke-width: 1.5;
+}
+
+/* Tooltip */
+.heatmap-tooltip {
+  position: fixed;
+  z-index: 100000;
+  pointer-events: none;
+  background: rgba(20,20,20,0.95);
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+.heatmap-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.heatmap-tooltip strong {
+  color: #fff;
+}
+.heatmap-tooltip .tooltip-date {
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* Legend */
+.heatmap-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 .heatmap-legend {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
-  margin-top: 10px;
-  font-size: 0.72rem;
+  gap: 3px;
+  font-size: 0.7rem;
   color: var(--text-muted);
+  margin-left: auto;
 }
 .heatmap-legend-label {
   margin: 0 3px;
 }
 .heatmap-legend-cell {
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
   border-radius: 2px;
   display: inline-block;
 }
-
-/* Keep old pulse chart styles for fallback */
-.pulse-chart {
-  width: 100%;
-  overflow-x: auto;
+.heatmap-link {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  transition: color var(--transition);
 }
-.pulse-chart svg {
-  display: block;
-  min-width: 100%;
+.heatmap-link:hover {
+  color: var(--text-primary);
+  opacity: 1;
 }
 
 .activity-show-more {
@@ -1478,34 +1555,93 @@ section {
   white-space: nowrap;
 }
 
-/* ===== HERO SOCIAL BUTTONS ===== */
-.hero-socials {
+/* ===== AVATAR ORBIT WRAPPER ===== */
+.avatar-orbit-wrapper {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 1.5rem;
   display: flex;
-  gap: 12px;
+  align-items: center;
   justify-content: center;
-  margin-top: 0.5rem;
 }
+.avatar-orbit-wrapper .hero-avatar {
+  margin-bottom: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Social buttons — shared base */
 .social-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   border: 1px solid var(--border);
-  background: transparent;
+  background: rgba(0,0,0,0.85);
   color: var(--text-muted);
-  transition: color var(--transition), border-color var(--transition), background var(--transition);
+  transition: color 0.3s, border-color 0.3s, background 0.3s, transform 0.3s, box-shadow 0.3s;
+  text-decoration: none;
 }
 .social-btn:hover {
   color: var(--text-primary);
   border-color: #555;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.1);
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(255,255,255,0.1);
   opacity: 1;
 }
 .social-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
+}
+
+/* ORBIT MODE — buttons circle the avatar */
+.hero-socials.orbit-mode {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  animation: orbitSpin 30s linear infinite;
+}
+.hero-socials.orbit-mode .social-btn {
+  position: absolute;
+  pointer-events: auto;
+  /* counter-rotate so icons stay upright */
+  animation: orbitCounterSpin 30s linear infinite;
+}
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes orbitCounterSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* DOCKED MODE — fixed top-right row */
+.hero-socials.docked-mode {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 10000;
+  display: flex;
+  gap: 8px;
+  animation: none;
+}
+.hero-socials.docked-mode .social-btn {
+  position: static;
+  animation: none;
+  transform: none;
+}
+
+/* Fly transition */
+.social-btn.flying {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* ===== FOOTER ===== */
@@ -1577,7 +1713,10 @@ footer {
 
   #hero h1 { font-size: 1.75rem; }
   .hero-avatar { width: 90px; height: 90px; }
+  .avatar-orbit-wrapper { width: 130px; height: 130px; }
   .hero-stats { gap: 24px; }
+  .skills-experience-row { flex-direction: column; gap: 1.5rem; }
+  .skills-experience-row > .timeline { min-width: 0; }
 
   .about-grid { grid-template-columns: 1fr; }
   .repo-grid, .collab-grid, .store-grid {
