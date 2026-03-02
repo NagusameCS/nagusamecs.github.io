@@ -7,6 +7,11 @@ const GH_USER = 'NagusameCS';
 const GH_API = 'https://api.github.com';
 const CONFIG_BASE = 'config';
 
+// Icon overrides — local SVG/PNG for specific repos
+const ICON_OVERRIDES = {
+  'TensorOS': 'tensoricon.svg',
+};
+
 // Language colors (GitHub-style)
 const LANG_COLORS = {
   JavaScript: '#f1e05a', TypeScript: '#3178c6', Python: '#3572A5',
@@ -107,6 +112,7 @@ async function loadProfile() {
 
 // ===== REPOSITORIES =====
 let allRepos = [];
+let currentView = 'grid';
 
 async function loadRepos() {
   // Fetch all repos (paginated)
@@ -137,11 +143,21 @@ function renderRepos(repos) {
     return;
   }
 
+  const isExpanded = currentView === 'expanded';
+  grid.className = isExpanded ? 'repo-grid repo-grid-expanded' : 'repo-grid';
+
   grid.innerHTML = repos.map((repo, i) => {
     const langColor = LANG_COLORS[repo.language] || '#8b949e';
-    const iconUrl = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
+    const overrideIcon = ICON_OVERRIDES[repo.name];
+    const iconUrl = overrideIcon || `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
+    const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
+
+    const socialPreviewHtml = isExpanded
+      ? `<img class="repo-card-preview" src="${socialPreviewUrl}" alt="" onerror="this.style.display='none'">`
+      : '';
+
     return `
-      <div class="repo-card fade-in" data-index="${i}" data-fork="${repo.fork}" style="animation-delay: ${i * 0.03}s">
+      <div class="repo-card ${isExpanded ? 'repo-card-expanded' : ''} fade-in" data-index="${i}" data-fork="${repo.fork}" style="animation-delay: ${i * 0.03}s">
         <div class="repo-card-header">
           <img class="repo-card-icon" src="${iconUrl}" alt="" onerror="repoIconFallback(this)">
           <div>
@@ -149,6 +165,7 @@ function renderRepos(repos) {
             ${repo.fork ? '<span class="repo-card-fork">Fork</span>' : ''}
           </div>
         </div>
+        ${socialPreviewHtml}
         <p class="repo-card-desc">${escapeHtml(repo.description) || '<span style="color:var(--text-muted)">No description provided.</span>'}</p>
         <div class="repo-card-meta">
           ${repo.language ? `<span><span class="lang-dot" style="background:${langColor}"></span>${repo.language}</span>` : ''}
@@ -202,20 +219,18 @@ function repoIconFallback(img) {
 function openRepoModal(repo) {
   const modal = document.getElementById('repo-modal');
   const langColor = LANG_COLORS[repo.language] || '#8b949e';
-  const iconUrl = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
+  const overrideIcon = ICON_OVERRIDES[repo.name];
+  const iconUrl = overrideIcon || `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
   // Social preview: use opengraph image
   const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
 
-  // Icon — try .github/icon.png → letter placeholder
+  // Icon — try override or .github/icon.png → hide on error
   const iconEl = document.getElementById('modal-icon');
   iconEl.src = iconUrl;
+  iconEl.style.display = 'block';
   iconEl.onerror = function () {
     this.style.display = 'none';
   };
-  iconEl.onload = function () {
-    this.style.display = 'block';
-  };
-  iconEl.style.display = 'block';
 
   // Social preview — try repo's own social image, then OpenGraph
   const previewEl = document.getElementById('modal-social-preview');
@@ -224,7 +239,6 @@ function openRepoModal(repo) {
   // Chain: custom .github/social-preview.png → GitHub OpenGraph image
   const customPreview = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/social-preview.png`;
 
-  // We use a test image to check if custom preview exists
   const testImg = new Image();
   testImg.onload = function () {
     previewEl.src = customPreview;
@@ -270,11 +284,121 @@ function openRepoModal(repo) {
 
   modal.classList.add('active');
   document.body.style.overflow = 'hidden';
+
+  // Set current repo for tab loading
+  currentModalRepo = repo;
+
+  // Reset to Overview tab
+  switchModalTab('overview');
+
+  // Clear tab cache for this repo (so lazy loads fire again)
+  ['readme', 'releases', 'license'].forEach(t => {
+    delete modalTabCache[`${repo.full_name}-${t}`];
+  });
+
+  // Load full language breakdown
+  loadModalLanguages(repo);
 }
 
 function closeModal() {
   document.getElementById('repo-modal').classList.remove('active');
   document.body.style.overflow = '';
+  currentModalRepo = null;
+}
+
+// Track current modal repo for tab loading
+let currentModalRepo = null;
+const modalTabCache = {};
+
+function switchModalTab(tabName) {
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+  document.querySelectorAll('.modal-tab-content').forEach(c => c.classList.toggle('active', c.id === `modal-tab-${tabName}`));
+
+  if (!currentModalRepo) return;
+  const repo = currentModalRepo;
+  const cacheKey = `${repo.full_name}-${tabName}`;
+
+  if (tabName === 'readme' && !modalTabCache[cacheKey]) {
+    modalTabCache[cacheKey] = true;
+    loadModalReadme(repo);
+  } else if (tabName === 'releases' && !modalTabCache[cacheKey]) {
+    modalTabCache[cacheKey] = true;
+    loadModalReleases(repo);
+  } else if (tabName === 'license' && !modalTabCache[cacheKey]) {
+    modalTabCache[cacheKey] = true;
+    loadModalLicense(repo);
+  }
+}
+
+async function loadModalReadme(repo) {
+  const el = document.getElementById('modal-readme-body');
+  el.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>';
+  try {
+    const res = await fetch(`${GH_API}/repos/${repo.full_name}/readme`, {
+      headers: { Accept: 'application/vnd.github.html' }
+    });
+    if (!res.ok) throw new Error('No README');
+    const html = await res.text();
+    el.innerHTML = html;
+  } catch {
+    el.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No README available.</p>';
+  }
+}
+
+async function loadModalReleases(repo) {
+  const el = document.getElementById('modal-releases-body');
+  el.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading releases...</div>';
+  try {
+    const releases = await fetchJSON(`${GH_API}/repos/${repo.full_name}/releases?per_page=10`);
+    if (releases.length === 0) {
+      el.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No releases published.</p>';
+      return;
+    }
+    el.innerHTML = releases.map(r => {
+      const body = r.body ? escapeHtml(r.body).substring(0, 300) + (r.body.length > 300 ? '...' : '') : 'No release notes.';
+      return `
+        <div class="release-item">
+          <h4>${escapeHtml(r.name || r.tag_name)}</h4>
+          <span class="release-tag"><i class="fas fa-tag"></i> ${escapeHtml(r.tag_name)} &middot; ${timeAgo(r.published_at || r.created_at)}</span>
+          <p>${body}</p>
+          <a href="${r.html_url}" target="_blank">View release &rarr;</a>
+        </div>`;
+    }).join('');
+  } catch {
+    el.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">Could not load releases.</p>';
+  }
+}
+
+async function loadModalLicense(repo) {
+  const el = document.getElementById('modal-license-body');
+  el.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading license...</div>';
+  try {
+    const res = await fetch(`${GH_API}/repos/${repo.full_name}/license`);
+    if (!res.ok) throw new Error('No license');
+    const data = await res.json();
+    const content = atob(data.content);
+    el.innerHTML = `<pre>${escapeHtml(content)}</pre>`;
+  } catch {
+    el.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No license file found.</p>';
+  }
+}
+
+async function loadModalLanguages(repo) {
+  const el = document.getElementById('modal-languages-detail');
+  el.innerHTML = '';
+  try {
+    const langs = await fetchJSON(`${GH_API}/repos/${repo.full_name}/languages`);
+    const entries = Object.entries(langs);
+    if (entries.length === 0) return;
+    const total = entries.reduce((s, [, v]) => s + v, 0);
+    el.innerHTML = entries.map(([lang, bytes]) => {
+      const pct = ((bytes / total) * 100).toFixed(1);
+      const color = LANG_COLORS[lang] || '#8b949e';
+      return `<span class="modal-lang-tag"><span class="lang-dot" style="background:${color}"></span>${lang} ${pct}%</span>`;
+    }).join('');
+  } catch {
+    // Silently fail
+  }
 }
 
 // ===== COLLABORATIONS =====
@@ -582,6 +706,16 @@ function setupFilters() {
       else if (filter === 'fork') renderRepos(allRepos.filter(r => r.fork));
     });
   });
+
+  // View toggle buttons
+  document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentView = btn.dataset.view;
+      renderRepos(allRepos);
+    });
+  });
 }
 
 // ===== MODAL EVENTS =====
@@ -592,6 +726,26 @@ function setupModal() {
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
+  });
+
+  // Tab clicks
+  document.querySelectorAll('.modal-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchModalTab(tab.dataset.tab));
+  });
+
+  // Chevron navigation
+  const tabNames = ['overview', 'readme', 'releases', 'license'];
+  document.querySelector('.modal-chevron-left').addEventListener('click', () => {
+    const currentTab = document.querySelector('.modal-tab.active')?.dataset.tab || 'overview';
+    const idx = tabNames.indexOf(currentTab);
+    const prev = tabNames[(idx - 1 + tabNames.length) % tabNames.length];
+    switchModalTab(prev);
+  });
+  document.querySelector('.modal-chevron-right').addEventListener('click', () => {
+    const currentTab = document.querySelector('.modal-tab.active')?.dataset.tab || 'overview';
+    const idx = tabNames.indexOf(currentTab);
+    const next = tabNames[(idx + 1) % tabNames.length];
+    switchModalTab(next);
   });
 }
 
