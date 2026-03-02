@@ -1122,9 +1122,11 @@ init();
     const wrapper = container.closest('.avatar-orbit-wrapper');
     if (!wrapper) return;
 
-    const SPEED = 0.0007;        // radians per ms
+    const BASE_SPEED = 0.0007;   // radians per ms (normal speed)
+    const MIN_SPEED = 0.00008;   // radians per ms (when cursor is very close)
+    const SLOW_RADIUS = 180;     // px — cursor within this distance starts slowing
     const RADIUS_X = 108;        // horizontal radius (wide)
-    const RADIUS_Y = 18;         // vertical radius (flat — ring viewed at slight angle)
+    const RADIUS_Y = 18;         // vertical radius (flat ring)
     const SCALE_FRONT = 1.05;
     const SCALE_BACK = 0.6;
     const OPACITY_FRONT = 1.0;
@@ -1133,10 +1135,26 @@ init();
     const heroSection = document.getElementById('hero');
     let isDocked = false;
     let flyT = 0;                // smoothed scroll progress 0..1
-    let startTime = performance.now();
+    let orbitAngle = 0;          // accumulated angle (not time-based, so speed changes work)
+    let lastTime = performance.now();
+
+    // Track mouse position for proximity slowdown
+    let mouseX = -9999, mouseY = -9999;
+    document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+    document.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
 
     function animate(now) {
-      const elapsed = now - startTime;
+      const dt = Math.min(now - lastTime, 50); // cap delta to avoid big jumps
+      lastTime = now;
+
+      /* --- cursor proximity → speed factor --- */
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const wrapCX = wrapperRect.left + wrapperRect.width / 2;
+      const wrapCY = wrapperRect.top + wrapperRect.height / 2;
+      const dist = Math.hypot(mouseX - wrapCX, mouseY - wrapCY);
+      const proximity = Math.max(0, Math.min(1, 1 - dist / SLOW_RADIUS)); // 1=on top, 0=far
+      const speed = BASE_SPEED + (MIN_SPEED - BASE_SPEED) * proximity;
+      orbitAngle += speed * dt;
 
       /* --- scroll progress (0 = hero fully visible, 1 = hero scrolled away) --- */
       let rawScroll = 0;
@@ -1144,7 +1162,6 @@ init();
         const r = heroSection.getBoundingClientRect();
         rawScroll = Math.max(0, Math.min(1, -r.top / (r.height * 0.55)));
       }
-      // Smooth toward target
       flyT += (rawScroll - flyT) * 0.07;
 
       /* --- dock / undock --- */
@@ -1176,15 +1193,15 @@ init();
         const btnW = btns[0] ? btns[0].offsetWidth / 2 : 18;
         const btnH = btns[0] ? btns[0].offsetHeight / 2 : 18;
 
-        // Docked target: top-right of wrapper, spaced in a row
-        // (these are in wrapper-relative coords — will never actually be used
-        //  because we switch to CSS docked-mode, but we use them as fly targets)
-        const dockBaseX = wW + 60;
-        const dockY = -50;
+        // Fly-out target: fixed top-right of viewport, converted to wrapper-local coords
+        const wr = wrapper.getBoundingClientRect();
+        const dockVpRight = 20;   // px from right edge of viewport
+        const dockVpTop = 64;     // px from top (below nav)
+        const dockGap = 44;       // spacing between buttons in docked row
 
         btns.forEach((btn, i) => {
           const baseAngle = (2 * Math.PI * i) / count;
-          const angle = baseAngle + SPEED * elapsed;
+          const angle = baseAngle + orbitAngle;
 
           // Orbit position (ellipse)
           const ox = cx + RADIUS_X * Math.cos(angle) - btnW;
@@ -1194,16 +1211,17 @@ init();
           const depth = Math.sin(angle);
           const scaleOrbit = SCALE_BACK + (SCALE_FRONT - SCALE_BACK) * (depth + 1) / 2;
           const opacityOrbit = OPACITY_BACK + (OPACITY_FRONT - OPACITY_BACK) * (depth + 1) / 2;
-          const zOrbit = depth > 0 ? 3 : 0;
 
-          // Fly-out target (fly rightward staggered)
-          const flyX = dockBaseX + i * 44;
-          const flyY = dockY;
+          // Fly target in wrapper-local coords
+          // Viewport target: right edge - offset, positioned in a row
+          const totalBtnsWidth = count * dockGap;
+          const flyLocalX = (window.innerWidth - dockVpRight - totalBtnsWidth + i * dockGap) - wr.left;
+          const flyLocalY = (dockVpTop + 4) - wr.top;
 
           // Interpolate orbit → fly-out
           const t = flyT;
-          const x = ox + (flyX - ox) * t;
-          const y = oy + (flyY - oy) * t;
+          const x = ox + (flyLocalX - ox) * t;
+          const y = oy + (flyLocalY - oy) * t;
           const sc = scaleOrbit + (1 - scaleOrbit) * t;
           const op = opacityOrbit + (1 - opacityOrbit) * t;
 

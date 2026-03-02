@@ -1561,7 +1561,7 @@ section {
   position: relative;
   width: 200px;
   height: 200px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1700,7 +1700,7 @@ footer {
 
   #hero h1 { font-size: 1.75rem; }
   .hero-avatar { width: 90px; height: 90px; }
-  .avatar-orbit-wrapper { width: 160px; height: 160px; }
+  .avatar-orbit-wrapper { width: 160px; height: 160px; margin-bottom: 0.3rem; }
   .hero-stats { gap: 24px; }
   .skills-experience-row { flex-direction: column; gap: 1.5rem; }
   .skills-experience-row > .timeline { min-width: 0; }
