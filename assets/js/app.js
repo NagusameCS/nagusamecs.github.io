@@ -812,3 +812,227 @@ async function init() {
 }
 
 init();
+
+// ===== KONAMI CODE EASTER EGG — AGAR.IO MODE =====
+(function () {
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','KeyB','KeyA'];
+  let seq = 0;
+  let active = false;
+
+  // State
+  let blob, hud, blobSize, blobX, blobY, targetX, targetY, frame, food, eaten, scrollY0;
+
+  document.addEventListener('keydown', (e) => {
+    if (active) {
+      if (e.key === 'Escape') stopAgar();
+      return;
+    }
+    const expect = KONAMI[seq];
+    // Match arrow keys by code, letter keys by key
+    const match =
+      (expect.startsWith('Arrow') && e.code === expect) ||
+      (expect === 'KeyB' && e.key.toLowerCase() === 'b') ||
+      (expect === 'KeyA' && e.key.toLowerCase() === 'a');
+
+    if (match) {
+      seq++;
+      if (seq === KONAMI.length) {
+        seq = 0;
+        const avatar = document.getElementById('avatar');
+        if (avatar) {
+          const r = avatar.getBoundingClientRect();
+          if (r.top < window.innerHeight && r.bottom > 0) startAgar();
+        }
+      }
+    } else {
+      seq = (e.code === KONAMI[0]) ? 1 : 0;
+    }
+  });
+
+  function startAgar() {
+    if (active) return;
+    active = true;
+    eaten = 0;
+    blobSize = 120;
+    scrollY0 = window.scrollY;
+
+    const avatarSrc = document.getElementById('avatar').src;
+
+    // Blob element
+    blob = document.createElement('div');
+    blob.id = 'agar-blob';
+    Object.assign(blob.style, {
+      position: 'fixed', left: '0', top: '0',
+      width: blobSize + 'px', height: blobSize + 'px',
+      borderRadius: '50%', zIndex: '99999', pointerEvents: 'none',
+      backgroundImage: `url(${avatarSrc})`, backgroundSize: 'cover', backgroundPosition: 'center',
+      border: '3px solid rgba(255,255,255,0.35)',
+      boxShadow: '0 0 30px rgba(255,255,255,0.08)',
+      transform: 'translate(-50%,-50%)',
+      transition: 'width 0.2s ease, height 0.2s ease',
+    });
+    document.body.appendChild(blob);
+
+    // HUD
+    hud = document.createElement('div');
+    hud.id = 'agar-hud';
+    hud.innerHTML = `
+      <div style="position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100000;
+        background:rgba(0,0,0,0.9);border:1px solid #333;border-radius:8px;padding:10px 22px;
+        font-family:inherit;color:#fff;text-align:center;pointer-events:none;font-size:0.82rem;
+        backdrop-filter:blur(6px);">
+        <div style="font-size:1rem;font-weight:700;letter-spacing:1px;margin-bottom:3px;">AGAR MODE</div>
+        <div>Eaten: <strong id="agar-eaten">0</strong> &nbsp;&middot;&nbsp; Size: <strong id="agar-size">120</strong></div>
+        <div style="color:#666;font-size:0.7rem;margin-top:3px;">Move mouse &middot; ESC to exit</div>
+      </div>`;
+    document.body.appendChild(hud);
+
+    // Disable scrolling
+    document.body.style.overflow = 'hidden';
+
+    // Hide original avatar
+    document.getElementById('avatar').style.visibility = 'hidden';
+
+    // Starting position = center of viewport
+    blobX = window.innerWidth / 2;
+    blobY = window.innerHeight / 2;
+    targetX = blobX;
+    targetY = blobY;
+
+    collectFood();
+
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('touchmove', onTouch, { passive: false });
+
+    frame = requestAnimationFrame(loop);
+  }
+
+  // Gather all "edible" elements
+  function collectFood() {
+    const sels = [
+      '.skill-tag', '.about-detail-tag', '.highlight-item',
+      '.repo-card', '.store-card', '.award-card', '.collab-card',
+      '.contact-card', '.activity-item', '.timeline-item',
+      '.filter-btn', '.view-btn', '.stat', '.lang-bar',
+      '.section-title', '.nav-logo', '.nav-links a',
+      '.hero-meta span', '.hero-bio', '.store-badge',
+      '.modal-topic', '.repo-card-meta span',
+    ];
+    food = [];
+    sels.forEach(s => {
+      document.querySelectorAll(s).forEach(el => {
+        const r = el.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0 && !el.dataset.agarEaten) {
+          food.push(el);
+        }
+      });
+    });
+  }
+
+  function onMove(e) { targetX = e.clientX; targetY = e.clientY; }
+  function onTouch(e) { e.preventDefault(); targetX = e.touches[0].clientX; targetY = e.touches[0].clientY; }
+
+  function loop() {
+    if (!active) return;
+
+    // Smooth movement — larger blob moves slower like real agar.io
+    const speed = Math.max(0.03, 0.1 - blobSize * 0.00008);
+    blobX += (targetX - blobX) * speed;
+    blobY += (targetY - blobY) * speed;
+
+    blob.style.left = blobX + 'px';
+    blob.style.top = blobY + 'px';
+    blob.style.width = blobSize + 'px';
+    blob.style.height = blobSize + 'px';
+
+    // Collision detection
+    const blobR = blobSize / 2;
+
+    for (let i = food.length - 1; i >= 0; i--) {
+      const el = food[i];
+      if (el.dataset.agarEaten) { food.splice(i, 1); continue; }
+
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+
+      const elSize = Math.max(r.width, r.height);
+
+      // Must be bigger to eat
+      if (blobSize <= elSize) continue;
+
+      // Distance from blob center to element center
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const dist = Math.hypot(blobX - cx, blobY - cy);
+
+      // Eat when the element center is within the blob
+      if (dist < blobR * 0.65) {
+        eatEl(el, elSize);
+        food.splice(i, 1);
+      }
+    }
+
+    // Auto-scroll the page toward the blob if it's near edges
+    const margin = 60;
+    if (blobY < margin) window.scrollBy(0, -6);
+    else if (blobY > window.innerHeight - margin) window.scrollBy(0, 6);
+
+    // Re-collect food periodically (for elements that came into view from scrolling)
+    if (Math.random() < 0.01) collectFood();
+
+    frame = requestAnimationFrame(loop);
+  }
+
+  function eatEl(el, elSize) {
+    el.dataset.agarEaten = '1';
+
+    // Satisfying consume animation
+    el.style.transition = 'transform 0.25s cubic-bezier(0.4,0,1,1), opacity 0.25s ease';
+    el.style.transformOrigin = 'center';
+    el.style.transform = 'scale(0) rotate(10deg)';
+    el.style.opacity = '0';
+    el.style.pointerEvents = 'none';
+
+    // Grow — bigger items = more growth
+    const growth = Math.max(1.5, Math.sqrt(elSize) * 0.6);
+    blobSize += growth;
+
+    // Pulse effect on blob
+    blob.style.transition = 'width 0.1s ease, height 0.1s ease';
+    setTimeout(() => {
+      blob.style.transition = 'width 0.2s ease, height 0.2s ease';
+    }, 100);
+
+    // Update HUD
+    eaten++;
+    const eatenEl = document.getElementById('agar-eaten');
+    const sizeEl = document.getElementById('agar-size');
+    if (eatenEl) eatenEl.textContent = eaten;
+    if (sizeEl) sizeEl.textContent = Math.round(blobSize);
+  }
+
+  function stopAgar() {
+    active = false;
+    cancelAnimationFrame(frame);
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('touchmove', onTouch);
+
+    // Remove blob + HUD
+    if (blob) blob.remove();
+    if (hud) hud.remove();
+
+    // Restore all eaten elements
+    document.querySelectorAll('[data-agar-eaten]').forEach(el => {
+      el.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+      el.style.transform = '';
+      el.style.opacity = '';
+      el.style.pointerEvents = '';
+      delete el.dataset.agarEaten;
+    });
+
+    // Restore avatar + scrolling
+    document.getElementById('avatar').style.visibility = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, scrollY0);
+  }
+})();
