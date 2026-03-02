@@ -45,6 +45,29 @@ a:hover { opacity: 0.7; }
   letter-spacing: 2px;
   font-size: 0.95rem;
 }
+.section-title-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  position: relative;
+  display: inline-block;
+}
+.section-title-link:hover { color: var(--text-primary); }
+.section-title-hint {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text-muted);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s, transform 0.2s;
+  margin-top: 4px;
+}
+.section-title-link:hover .section-title-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
 .section-title::after {
   content: '';
   display: block;

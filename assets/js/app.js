@@ -63,7 +63,7 @@ async function loadProfile() {
   document.title = `${displayName} — Portfolio`;
 
   // Bio
-  const bioText = profile.bio || `Software developer at ${profile.company || 'OpenCS.dev'}. Building things that matter.`;
+  const bioText = profile.bio || 'Great things are not done quickly';
   document.getElementById('bio').textContent = bioText;
 
   // Meta
