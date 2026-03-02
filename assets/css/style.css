@@ -849,74 +849,171 @@ section {
   color: var(--text-secondary);
   overflow-wrap: break-word;
 }
-.modal-readme-body h1,
-.modal-readme-body h2,
-.modal-readme-body h3,
-.modal-readme-body h4 {
-  color: var(--text-primary);
-  margin: 1.2em 0 0.5em;
-  font-weight: 600;
+
+/* ===== GitHub-style Markdown Body ===== */
+.markdown-body {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
-.modal-readme-body h1 { font-size: 1.3rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-.modal-readme-body h2 { font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
-.modal-readme-body h3 { font-size: 0.95rem; }
-.modal-readme-body p { margin-bottom: 0.8em; }
-.modal-readme-body pre {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  padding: 12px;
-  border-radius: 4px;
-  overflow-x: auto;
-  font-size: 0.8rem;
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  color: var(--text-primary);
+  margin: 1.5em 0 0.5em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.markdown-body h1 { font-size: 1.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; margin-top: 0; }
+.markdown-body h2 { font-size: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.markdown-body h3 { font-size: 1.05rem; }
+.markdown-body h4 { font-size: 0.95rem; }
+.markdown-body h5 { font-size: 0.88rem; }
+.markdown-body h6 { font-size: 0.82rem; color: var(--text-muted); }
+.markdown-body p {
   margin-bottom: 1em;
 }
-.modal-readme-body code {
-  background: var(--bg-tertiary);
-  padding: 2px 5px;
-  border-radius: 3px;
+.markdown-body pre {
+  background: #161b22;
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
   font-size: 0.82rem;
+  margin-bottom: 1em;
+  line-height: 1.5;
 }
-.modal-readme-body pre code {
+.markdown-body code {
+  background: rgba(110,118,129,0.2);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-size: 0.85em;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+}
+.markdown-body pre code {
   background: none;
   padding: 0;
+  font-size: inherit;
+  border-radius: 0;
 }
-.modal-readme-body img {
+.markdown-body img {
   max-width: 100%;
   border-radius: var(--radius-sm);
+  display: inline-block;
 }
-.modal-readme-body a {
-  color: var(--text-primary);
+.markdown-body a {
+  color: #58a6ff;
+  text-decoration: none;
+}
+.markdown-body a:hover {
   text-decoration: underline;
-  text-decoration-color: var(--border);
 }
-.modal-readme-body a:hover {
-  text-decoration-color: var(--text-muted);
+.markdown-body ul, .markdown-body ol {
+  padding-left: 2em;
+  margin-bottom: 1em;
 }
-.modal-readme-body ul, .modal-readme-body ol {
-  padding-left: 1.5em;
-  margin-bottom: 0.8em;
+.markdown-body li {
+  margin-bottom: 0.3em;
 }
-.modal-readme-body li { margin-bottom: 0.3em; }
-.modal-readme-body blockquote {
-  border-left: 3px solid var(--border);
-  padding-left: 12px;
+.markdown-body li + li {
+  margin-top: 0.25em;
+}
+.markdown-body li > ul,
+.markdown-body li > ol {
+  margin-top: 0.25em;
+  margin-bottom: 0;
+}
+.markdown-body blockquote {
+  border-left: 4px solid var(--border);
+  padding: 0 1em;
   color: var(--text-muted);
-  margin: 0.8em 0;
+  margin: 0 0 1em;
 }
-.modal-readme-body table {
+.markdown-body blockquote > :first-child { margin-top: 0; }
+.markdown-body blockquote > :last-child { margin-bottom: 0; }
+.markdown-body table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 1em;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  display: block;
+  overflow-x: auto;
 }
-.modal-readme-body th, .modal-readme-body td {
+.markdown-body th, .markdown-body td {
   border: 1px solid var(--border);
-  padding: 6px 10px;
+  padding: 8px 12px;
   text-align: left;
 }
-.modal-readme-body th {
+.markdown-body th {
   background: var(--bg-tertiary);
   color: var(--text-primary);
+  font-weight: 600;
+}
+.markdown-body tr:nth-child(even) {
+  background: rgba(255,255,255,0.02);
+}
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+.markdown-body dl {
+  margin-bottom: 1em;
+}
+.markdown-body dt {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 1em;
+}
+.markdown-body dd {
+  padding-left: 1em;
+  margin-bottom: 0.5em;
+}
+/* Task list items */
+.markdown-body .task-list-item {
+  list-style: none;
+  margin-left: -1.5em;
+}
+.markdown-body .task-list-item input[type="checkbox"] {
+  margin-right: 0.4em;
+  vertical-align: middle;
+}
+/* Inline HTML details/summary (common in GH READMEs) */
+.markdown-body details {
+  margin-bottom: 1em;
+}
+.markdown-body details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+/* Badge images (shields.io etc) */
+.markdown-body p > a > img,
+.markdown-body p > img {
+  vertical-align: middle;
+}
+/* Emoji images from GitHub */
+.markdown-body img.emoji,
+.markdown-body img[alt*="emoji"] {
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: text-bottom;
+}
+/* Alert/Note/Warning boxes (GitHub flavored) */
+.markdown-body .markdown-alert {
+  border-left: 4px solid var(--border);
+  padding: 0.5em 1em;
+  margin-bottom: 1em;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: rgba(255,255,255,0.02);
+}
+.markdown-body .highlight pre, .markdown-body pre.highlight {
+  background: #161b22;
 }
 
 /* Releases body */

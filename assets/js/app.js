@@ -10,6 +10,16 @@ const CONFIG_BASE = 'config';
 // Icon overrides — local SVG/PNG for specific repos
 const ICON_OVERRIDES = {
   'TensorOS': 'tensoricon.svg',
+  'GitAudit': 'assets/icons/gitaudit.svg',
+  'HEATMAP': 'assets/icons/heatmap.svg',
+  'IVY': 'assets/icons/ivy.png',
+  'OpenNotes': 'assets/icons/opennotes.svg',
+  'OpenNotesAPI': 'assets/icons/opennotesapi.png',
+  'Pseudocode': 'assets/icons/pseudocode.png',
+  'Shell': 'assets/icons/shell.svg',
+  'Valentin': 'assets/icons/valentin.svg',
+  'Veritas': 'assets/icons/veritas.svg',
+  'opencs-repo': 'assets/icons/opencs-repo.svg',
 };
 
 // Language colors (GitHub-style)
@@ -149,10 +159,9 @@ function renderRepos(repos) {
   grid.innerHTML = repos.map((repo, i) => {
     const langColor = LANG_COLORS[repo.language] || '#8b949e';
     const overrideIcon = ICON_OVERRIDES[repo.name];
-    const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
 
     const socialPreviewHtml = isExpanded
-      ? `<img class="repo-card-preview" src="${socialPreviewUrl}" alt="" onerror="this.style.display='none'">`
+      ? `<img class="repo-card-preview" src="https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch || 'main'}/.github/social-preview.png" alt="" onerror="this.style.display='none'">`
       : '';
 
     const letter = (repo.name.charAt(0) || '?').toUpperCase();
@@ -224,8 +233,6 @@ function openRepoModal(repo) {
   const modal = document.getElementById('repo-modal');
   const langColor = LANG_COLORS[repo.language] || '#8b949e';
   const overrideIcon = ICON_OVERRIDES[repo.name];
-  // Social preview: use opengraph image
-  const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
 
   // Icon — only show image if there's an override, otherwise hide
   const iconEl = document.getElementById('modal-icon');
@@ -237,24 +244,35 @@ function openRepoModal(repo) {
     iconEl.style.display = 'none';
   }
 
-  // Social preview — try repo's own social image, then OpenGraph
+  // Social preview — try multiple custom paths, then hide if none found
   const previewEl = document.getElementById('modal-social-preview');
   previewEl.classList.remove('visible');
 
-  // Chain: custom .github/social-preview.png → GitHub OpenGraph image
-  const customPreview = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/social-preview.png`;
+  const branch = repo.default_branch || 'main';
+  const previewCandidates = [
+    `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${branch}/.github/social-preview.png`,
+    `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${branch}/.github/social-preview.jpg`,
+    `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${branch}/.github/preview.png`,
+    `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${branch}/.github/preview.jpg`,
+    `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${branch}/.github/banner.png`,
+  ];
 
-  const testImg = new Image();
-  testImg.onload = function () {
-    previewEl.src = customPreview;
-    previewEl.classList.add('visible');
-  };
-  testImg.onerror = function () {
-    // Use GitHub's OpenGraph image (always exists for public repos)
-    previewEl.src = socialPreviewUrl;
-    previewEl.classList.add('visible');
-  };
-  testImg.src = customPreview;
+  function tryPreview(idx) {
+    if (idx >= previewCandidates.length) {
+      // No custom preview found — hide
+      previewEl.style.display = 'none';
+      return;
+    }
+    const testImg = new Image();
+    testImg.onload = function () {
+      previewEl.src = previewCandidates[idx];
+      previewEl.style.display = '';
+      previewEl.classList.add('visible');
+    };
+    testImg.onerror = function () { tryPreview(idx + 1); };
+    testImg.src = previewCandidates[idx];
+  }
+  tryPreview(0);
 
   document.getElementById('modal-title').textContent = repo.name;
   document.getElementById('modal-language').innerHTML = repo.language
@@ -339,12 +357,76 @@ async function loadModalReadme(repo) {
   const el = document.getElementById('modal-readme-body');
   el.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>';
   try {
-    const res = await fetch(`${GH_API}/repos/${repo.full_name}/readme`, {
-      headers: { Accept: 'application/vnd.github.html' }
-    });
+    // Fetch raw README markdown from GitHub API
+    const meta = await fetchJSON(`${GH_API}/repos/${repo.full_name}/readme`);
+    const rawUrl = meta.download_url;
+    const res = await fetch(rawUrl);
     if (!res.ok) throw new Error('No README');
-    const html = await res.text();
-    el.innerHTML = html;
+    const md = await res.text();
+
+    // Configure marked with GitHub-flavored markdown + syntax highlighting
+    marked.setOptions({
+      gfm: true,
+      breaks: true,
+      highlight: function (code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          try { return hljs.highlight(code, { language: lang }).value; } catch {}
+        }
+        return hljs.highlightAuto(code).value;
+      },
+    });
+
+    // Fix relative image/link URLs to point to the repo's raw content
+    const baseRaw = `https://raw.githubusercontent.com/${repo.full_name}/${repo.default_branch}/`;
+    const baseRepo = `https://github.com/${repo.full_name}/blob/${repo.default_branch}/`;
+
+    const renderer = new marked.Renderer();
+
+    // Rewrite relative image src to raw.githubusercontent
+    renderer.image = function (href, title, text) {
+      // marked v12 may pass an object as first arg
+      if (typeof href === 'object') {
+        text = href.text || '';
+        title = href.title || '';
+        href = href.href || '';
+      }
+      if (href && !href.startsWith('http') && !href.startsWith('data:')) {
+        href = baseRaw + href.replace(/^\.\//, '');
+      }
+      const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+      return `<img src="${href}" alt="${escapeHtml(text || '')}"${titleAttr} style="max-width:100%;">`;
+    };
+
+    // Rewrite relative link href to GitHub blob
+    renderer.link = function (href, title, text) {
+      if (typeof href === 'object') {
+        text = href.text || '';
+        title = href.title || '';
+        href = href.href || '';
+      }
+      if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto:')) {
+        href = baseRepo + href.replace(/^\.\//, '');
+      }
+      const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+      return `<a href="${href}"${titleAttr} target="_blank" rel="noopener">${text}</a>`;
+    };
+
+    // Checkbox list items (GitHub task lists)
+    renderer.listitem = function (text) {
+      if (typeof text === 'object') text = text.text || '';
+      if (text.startsWith('<input')) {
+        return `<li class="task-list-item">${text}</li>\n`;
+      }
+      return `<li>${text}</li>\n`;
+    };
+
+    const html = marked.parse(md, { renderer });
+    el.innerHTML = `<div class="markdown-body">${html}</div>`;
+
+    // Apply syntax highlighting to any code blocks that weren't caught
+    el.querySelectorAll('pre code').forEach(block => {
+      hljs.highlightElement(block);
+    });
   } catch {
     el.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;">No README available.</p>';
   }
@@ -899,8 +981,9 @@ init();
       </div>`;
     document.body.appendChild(hud);
 
-    // Disable scrolling
-    document.body.style.overflow = 'hidden';
+    // Allow vertical scrolling (auto-scroll needs it) but prevent horizontal overflow
+    document.body.style.overflowX = 'hidden';
+    document.body.style.overflowY = 'auto';
 
     // Hide original avatar
     document.getElementById('avatar').style.visibility = 'hidden';
@@ -919,9 +1002,45 @@ init();
     frame = requestAnimationFrame(loop);
   }
 
-  // Gather all "edible" elements
+  // Gather all "edible" elements — break text into individual letter spans
   function collectFood() {
+    // First, shatter text nodes into individual letter spans (only once per element)
+    const textContainers = document.querySelectorAll(
+      'p, h1, h2, h3, h4, h5, h6, span, a, li, dt, dd, label, button, .skill-tag, .about-detail-tag, .hero-bio, .nav-logo'
+    );
+    textContainers.forEach(el => {
+      if (el.dataset.agarShattered || el.closest('#agar-hud') || el.closest('#agar-blob')) return;
+      // Only shatter direct text nodes
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+      const textNodes = [];
+      let node;
+      while ((node = walker.nextNode())) {
+        if (node.textContent.trim().length > 0) textNodes.push(node);
+      }
+      textNodes.forEach(textNode => {
+        const text = textNode.textContent;
+        if (text.trim().length === 0) return;
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < text.length; i++) {
+          if (text[i] === ' ') {
+            frag.appendChild(document.createTextNode(' '));
+          } else {
+            const s = document.createElement('span');
+            s.className = 'agar-letter';
+            s.textContent = text[i];
+            s.style.display = 'inline';
+            s.style.position = 'relative';
+            frag.appendChild(s);
+          }
+        }
+        textNode.parentNode.replaceChild(frag, textNode);
+      });
+      el.dataset.agarShattered = '1';
+    });
+
+    // Now also collect larger elements as food
     const sels = [
+      '.agar-letter',
       '.skill-tag', '.about-detail-tag', '.highlight-item',
       '.repo-card', '.store-card', '.award-card', '.collab-card',
       '.contact-card', '.activity-item', '.timeline-item',
@@ -933,6 +1052,7 @@ init();
     food = [];
     sels.forEach(s => {
       document.querySelectorAll(s).forEach(el => {
+        if (el.closest('#agar-hud') || el.closest('#agar-blob')) return;
         const r = el.getBoundingClientRect();
         if (r.width > 0 && r.height > 0 && !el.dataset.agarEaten) {
           food.push(el);
@@ -985,9 +1105,10 @@ init();
     }
 
     // Auto-scroll the page toward the blob if it's near edges
-    const margin = 60;
-    if (blobY < margin) window.scrollBy(0, -6);
-    else if (blobY > window.innerHeight - margin) window.scrollBy(0, 6);
+    const margin = 180;
+    const scrollSpeed = 14;
+    if (blobY < margin) window.scrollBy(0, -scrollSpeed * (1 - blobY / margin));
+    else if (blobY > window.innerHeight - margin) window.scrollBy(0, scrollSpeed * (1 - (window.innerHeight - blobY) / margin));
 
     // Re-collect food periodically (for elements that came into view from scrolling)
     if (Math.random() < 0.01) collectFood();
@@ -1040,6 +1161,21 @@ init();
       el.style.opacity = '';
       el.style.pointerEvents = '';
       delete el.dataset.agarEaten;
+    });
+
+    // Re-merge shattered letter spans back to text nodes
+    document.querySelectorAll('[data-agar-shattered]').forEach(el => {
+      delete el.dataset.agarShattered;
+      // Collect all text content from child spans and text nodes
+      const text = el.textContent;
+      // Remove all agar-letter spans and replace with single text node
+      const letters = el.querySelectorAll('.agar-letter');
+      if (letters.length === 0) return;
+      // Simple approach: normalize text nodes - let browser merge adjacent text
+      letters.forEach(span => {
+        span.replaceWith(span.textContent);
+      });
+      el.normalize();
     });
 
     // Restore avatar + scrolling
