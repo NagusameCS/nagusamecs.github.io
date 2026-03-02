@@ -65,11 +65,10 @@ async function loadProfile() {
   // Bio
   const bioText = profile.bio || `Software developer at ${profile.company || 'OpenCS.dev'}. Building things that matter.`;
   document.getElementById('bio').textContent = bioText;
-  document.getElementById('about-bio').textContent = bioText;
 
   // Meta
   if (profile.company) {
-    document.querySelector('#company span').textContent = profile.company;
+    document.getElementById('company-link').textContent = profile.company;
   } else {
     document.getElementById('company').style.display = 'none';
   }
@@ -427,12 +426,7 @@ async function loadActivity() {
 
 async function renderContributionGraph() {
   const container = document.getElementById('contribution-graph');
-  
-  // We'll use the GitHub events API as a proxy for activity,
-  // since the contribution graph requires auth/scraping.
-  // Build a heatmap from events for the last year.
   try {
-    // Fetch recent events (up to 300, which is the API max for public events)
     let allEvents = [];
     for (let p = 1; p <= 3; p++) {
       const events = await fetchJSONSafe(`${GH_API}/users/${GH_USER}/events/public?per_page=100&page=${p}`, []);
@@ -440,85 +434,77 @@ async function renderContributionGraph() {
       if (events.length < 100) break;
     }
 
-    // Count events by day
+    // Count events per day for last 90 days
     const dayCounts = {};
     allEvents.forEach(ev => {
       const day = ev.created_at.split('T')[0];
       dayCounts[day] = (dayCounts[day] || 0) + 1;
     });
 
-    // Build calendar for last 52 weeks
     const today = new Date();
-    const weeks = [];
-    const monthLabels = [];
-    let lastMonth = -1;
-
-    // Start from the Sunday of 52 weeks ago
-    const start = new Date(today);
-    start.setDate(start.getDate() - start.getDay() - 52 * 7);
-
-    for (let w = 0; w < 53; w++) {
-      const week = [];
-      for (let d = 0; d < 7; d++) {
-        const date = new Date(start);
-        date.setDate(date.getDate() + w * 7 + d);
-        const dateStr = date.toISOString().split('T')[0];
-        const count = dayCounts[dateStr] || 0;
-        const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 5 ? 2 : count <= 10 ? 3 : 4;
-        const isFuture = date > today;
-        week.push({ dateStr, count, level, isFuture });
-
-        // Track month labels
-        if (d === 0 && date.getMonth() !== lastMonth) {
-          monthLabels.push({ week: w, label: date.toLocaleDateString('en-US', { month: 'short' }) });
-          lastMonth = date.getMonth();
-        }
-      }
-      weeks.push(week);
+    const days = [];
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      days.push({ date: dateStr, count: dayCounts[dateStr] || 0, day: d });
     }
 
-    // Render
-    const totalContribs = allEvents.length;
+    const maxCount = Math.max(...days.map(d => d.count), 1);
+    const totalEvents = days.reduce((s, d) => s + d.count, 0);
+    const activeDays = days.filter(d => d.count > 0).length;
+
+    // Build SVG pulse bar chart
+    const barW = 7;
+    const gap = 2;
+    const svgW = days.length * (barW + gap);
+    const svgH = 100;
+
+    const bars = days.map((d, i) => {
+      const x = i * (barW + gap);
+      if (d.count === 0) return '';
+      const h = Math.max(3, (d.count / maxCount) * svgH);
+      const y = svgH - h;
+      const op = (0.35 + (d.count / maxCount) * 0.65).toFixed(2);
+      return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" rx="1.5" fill="#fff" opacity="${op}"><title>${d.date}: ${d.count} event${d.count > 1 ? 's' : ''}</title></rect>`;
+    }).join('');
+
+    // Month labels below the bars
+    const months = [];
+    let lastM = -1;
+    days.forEach((d, i) => {
+      const m = d.day.getMonth();
+      if (m !== lastM) {
+        lastM = m;
+        months.push(`<text x="${i * (barW + gap)}" y="${svgH + 14}" fill="#666" font-size="10" font-family="inherit">${d.day.toLocaleDateString('en-US', { month: 'short' })}</text>`);
+      }
+    });
+
     container.innerHTML = `
-      <div style="margin-bottom:12px;font-size:0.9rem;color:var(--text-secondary)">
-        ${totalContribs} contributions in the last year (based on public events)
+      <div class="pulse-header">
+        <div class="pulse-stats">
+          <span><strong>${totalEvents}</strong> events</span>
+          <span><strong>${activeDays}</strong> active days</span>
+        </div>
+        <span class="pulse-period">Last 90 days</span>
       </div>
-      <div class="contrib-months" style="margin-left:0">
-        ${monthLabels.map(m => `<span class="contrib-month-label" style="margin-left:${m.week * 15}px;position:absolute">${m.label}</span>`).join('')}
-      </div>
-      <div class="contrib-calendar" style="margin-top:24px">
-        ${weeks.map(week => `
-          <div class="contrib-week">
-            ${week.map(day => day.isFuture
-              ? `<div class="contrib-day" style="opacity:0"></div>`
-              : `<div class="contrib-day" data-level="${day.level}" title="${day.dateStr}: ${day.count} events"></div>`
-            ).join('')}
-          </div>
-        `).join('')}
-      </div>
-      <div class="contrib-legend">
-        <span>Less</span>
-        <div class="contrib-day" data-level="0"></div>
-        <div class="contrib-day" data-level="1"></div>
-        <div class="contrib-day" data-level="2"></div>
-        <div class="contrib-day" data-level="3"></div>
-        <div class="contrib-day" data-level="4"></div>
-        <span>More</span>
+      <div class="pulse-chart">
+        <svg width="100%" height="${svgH + 20}" viewBox="0 0 ${svgW} ${svgH + 20}" preserveAspectRatio="none">
+          <line x1="0" y1="${svgH}" x2="${svgW}" y2="${svgH}" stroke="#222" stroke-width="1"/>
+          ${bars}
+          ${months.join('')}
+        </svg>
       </div>
     `;
   } catch (e) {
-    container.innerHTML = `
-      <div style="text-align:center;padding:40px;">
-        <img src="https://ghchart.rshah.org/${GH_USER}" alt="GitHub Contribution Chart" style="width:100%;max-width:800px;border-radius:8px;">
-        <p style="margin-top:12px;font-size:0.85rem;color:var(--text-muted)">Contribution graph via ghchart.rshah.org</p>
-      </div>`;
+    container.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:2rem;">Could not load activity data.</p>`;
   }
 }
 
 async function loadRecentActivity() {
   const feed = document.getElementById('activity-feed');
   try {
-    const events = await fetchJSON(`${GH_API}/users/${GH_USER}/events/public?per_page=15`);
+    const events = await fetchJSON(`${GH_API}/users/${GH_USER}/events/public?per_page=30`);
 
     const eventIcons = {
       PushEvent: 'fas fa-code-commit',
@@ -535,39 +521,54 @@ async function loadRecentActivity() {
     };
 
     function describeEvent(ev) {
-      const repo = `<strong>${ev.repo.name.split('/')[1]}</strong>`;
+      const repoName = ev.repo.name.split('/')[1];
+      const repoLink = `<a href="https://github.com/${ev.repo.name}" target="_blank"><strong>${repoName}</strong></a>`;
       switch (ev.type) {
         case 'PushEvent': {
-          const count = ev.payload.commits?.length || 0;
-          return `Pushed ${count} commit${count !== 1 ? 's' : ''} to ${repo}`;
+          const commits = ev.payload.commits || [];
+          if (commits.length === 0) return null;
+          const msg = commits[0].message.split('\n')[0];
+          const extra = commits.length > 1 ? ` (+${commits.length - 1} more)` : '';
+          return `Pushed to ${repoLink}: "${escapeHtml(msg)}"${extra}`;
         }
         case 'CreateEvent':
-          return `Created ${ev.payload.ref_type} ${ev.payload.ref ? `<strong>${ev.payload.ref}</strong> in ` : ''}${repo}`;
+          if (ev.payload.ref_type === 'repository') return `Created repository ${repoLink}`;
+          return `Created ${ev.payload.ref_type} <strong>${ev.payload.ref || ''}</strong> in ${repoLink}`;
         case 'DeleteEvent':
-          return `Deleted ${ev.payload.ref_type} <strong>${ev.payload.ref}</strong> in ${repo}`;
+          return `Deleted ${ev.payload.ref_type} <strong>${ev.payload.ref}</strong> in ${repoLink}`;
         case 'WatchEvent':
-          return `Starred ${repo}`;
+          return `Starred ${repoLink}`;
         case 'ForkEvent':
-          return `Forked ${repo}`;
+          return `Forked ${repoLink}`;
         case 'IssuesEvent':
-          return `${ev.payload.action} issue in ${repo}`;
+          return `${ev.payload.action} issue in ${repoLink}`;
         case 'IssueCommentEvent':
-          return `Commented on issue in ${repo}`;
+          return `Commented on issue in ${repoLink}`;
         case 'PullRequestEvent':
-          return `${ev.payload.action} PR in ${repo}`;
+          return `${ev.payload.action} PR in ${repoLink}`;
         case 'PullRequestReviewEvent':
-          return `Reviewed PR in ${repo}`;
+          return `Reviewed PR in ${repoLink}`;
         case 'ReleaseEvent':
-          return `Published release in ${repo}`;
+          return `Published release in ${repoLink}`;
         default:
-          return `Activity in ${repo}`;
+          return `Activity in ${repoLink}`;
       }
     }
 
-    feed.innerHTML = events.slice(0, 10).map(ev => `
+    const items = events
+      .map(ev => ({ ev, desc: describeEvent(ev) }))
+      .filter(({ desc }) => desc !== null)
+      .slice(0, 10);
+
+    if (items.length === 0) {
+      feed.innerHTML = '<li class="activity-item"><span class="activity-text" style="color:var(--text-muted)">No recent activity.</span></li>';
+      return;
+    }
+
+    feed.innerHTML = items.map(({ ev, desc }) => `
       <li class="activity-item">
         <i class="${eventIcons[ev.type] || 'fas fa-bolt'}"></i>
-        <span class="activity-text">${describeEvent(ev)}</span>
+        <span class="activity-text">${desc}</span>
         <span class="activity-time">${timeAgo(ev.created_at)}</span>
       </li>
     `).join('');
