@@ -1126,7 +1126,7 @@ init();
     function positionInOrbit() {
       const wW = wrapper.offsetWidth;
       const wH = wrapper.offsetHeight;
-      const radius = Math.max(wW, wH) / 2 + 14; // slightly outside the avatar
+      const radius = Math.max(wW, wH) / 2 + 8;
       btns.forEach((btn, i) => {
         const angle = (2 * Math.PI * i) / count - Math.PI / 2;
         const cx = wW / 2 + radius * Math.cos(angle) - btn.offsetWidth / 2;
@@ -1141,36 +1141,43 @@ init();
       if (container.classList.contains('orbit-mode')) positionInOrbit();
     });
 
-    // Scroll handler — orbit → docked transition
+    // Scroll handler — progressive fly-off as you scroll past hero
     const heroSection = document.getElementById('hero');
     let isDocked = false;
 
     function onScroll() {
       if (!heroSection) return;
-      const heroBottom = heroSection.getBoundingClientRect().bottom;
-      const shouldDock = heroBottom < 80;
+      const heroRect = heroSection.getBoundingClientRect();
+      const heroH = heroRect.height;
+      // How far we've scrolled into the hero (0 = top visible, 1 = bottom at viewport top)
+      const scrollProgress = -heroRect.top / heroH;
+      // Start flying off when we've scrolled ~40% into hero, fully docked by ~85%
+      const shouldDock = scrollProgress > 0.85;
 
       if (shouldDock && !isDocked) {
         isDocked = true;
-        // Add flying class for smooth transition
-        btns.forEach(btn => {
-          btn.classList.add('flying');
-          btn.style.left = '';
-          btn.style.top = '';
+        // Stagger each button flying to docked position
+        btns.forEach((btn, i) => {
+          setTimeout(() => {
+            btn.classList.add('flying');
+            btn.style.left = '';
+            btn.style.top = '';
+          }, i * 50);
         });
         container.classList.remove('orbit-mode');
         container.classList.add('docked-mode');
-        // Remove from wrapper so it stays fixed
         document.body.appendChild(container);
-        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 700);
+        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 900);
       } else if (!shouldDock && isDocked) {
         isDocked = false;
-        btns.forEach(btn => btn.classList.add('flying'));
+        btns.forEach((btn, i) => {
+          setTimeout(() => btn.classList.add('flying'), i * 50);
+        });
         container.classList.remove('docked-mode');
         container.classList.add('orbit-mode');
         wrapper.appendChild(container);
         positionInOrbit();
-        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 700);
+        setTimeout(() => btns.forEach(b => b.classList.remove('flying')), 900);
       }
     }
 

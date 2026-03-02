@@ -1558,9 +1558,9 @@ section {
 /* ===== AVATAR ORBIT WRAPPER ===== */
 .avatar-orbit-wrapper {
   position: relative;
-  width: 160px;
-  height: 160px;
-  margin: 0 auto 1.5rem;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1623,12 +1623,12 @@ section {
   to   { transform: rotate(-360deg); }
 }
 
-/* DOCKED MODE — fixed top-right row */
+/* DOCKED MODE — fixed below nav header */
 .hero-socials.docked-mode {
   position: fixed;
-  top: 12px;
-  right: 16px;
-  z-index: 10000;
+  top: 64px;
+  right: 20px;
+  z-index: 999;
   display: flex;
   gap: 8px;
   animation: none;
@@ -1641,7 +1641,7 @@ section {
 
 /* Fly transition */
 .social-btn.flying {
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
 }
 
 /* ===== FOOTER ===== */
@@ -1713,7 +1713,7 @@ footer {
 
   #hero h1 { font-size: 1.75rem; }
   .hero-avatar { width: 90px; height: 90px; }
-  .avatar-orbit-wrapper { width: 130px; height: 130px; }
+  .avatar-orbit-wrapper { width: 160px; height: 160px; }
   .hero-stats { gap: 24px; }
   .skills-experience-row { flex-direction: column; gap: 1.5rem; }
   .skills-experience-row > .timeline { min-width: 0; }
