@@ -141,10 +141,11 @@ function renderRepos(repos) {
   grid.innerHTML = repos.map((repo, i) => {
     const langColor = LANG_COLORS[repo.language] || '#8b949e';
     const iconUrl = `https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch}/.github/icon.png`;
+    const homepageAttr = repo.homepage ? escapeHtml(repo.homepage) : '';
     return `
       <div class="repo-card fade-in" data-index="${i}" data-fork="${repo.fork}" style="animation-delay: ${i * 0.03}s">
         <div class="repo-card-header">
-          <img class="repo-card-icon" src="${iconUrl}" alt="" onerror="this.outerHTML='<div class=\\'repo-card-icon-placeholder\\'><i class=\\'fas fa-code-branch\\'></i></div>'">
+          <img class="repo-card-icon" src="${iconUrl}" alt="" data-homepage="${homepageAttr}" onerror="repoIconFallback(this)">
           <div>
             <span class="repo-card-title">${escapeHtml(repo.name)}</span>
             ${repo.fork ? '<span class="repo-card-fork">Fork</span>' : ''}
@@ -192,6 +193,22 @@ function computeLanguages(repos) {
   }).join('');
 }
 
+// ===== ICON FALLBACK =====
+function repoIconFallback(img) {
+  const homepage = img.dataset.homepage;
+  if (homepage && !img.dataset.triedFavicon) {
+    img.dataset.triedFavicon = 'true';
+    // Try Google's favicon service for the homepage domain
+    try {
+      const domain = new URL(homepage.startsWith('http') ? homepage : `https://${homepage}`).hostname;
+      img.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+      return;
+    } catch {}
+  }
+  // Final fallback: placeholder icon
+  img.outerHTML = '<div class="repo-card-icon-placeholder"><i class="fas fa-code-branch"></i></div>';
+}
+
 // ===== REPO MODAL =====
 function openRepoModal(repo) {
   const modal = document.getElementById('repo-modal');
@@ -200,10 +217,21 @@ function openRepoModal(repo) {
   // Social preview: use opengraph image
   const socialPreviewUrl = `https://opengraph.githubassets.com/1/${GH_USER}/${repo.name}`;
 
-  // Icon
+  // Icon — try .github/icon.png → homepage favicon → hide
   const iconEl = document.getElementById('modal-icon');
   iconEl.src = iconUrl;
+  iconEl.dataset.homepage = repo.homepage || '';
+  iconEl.dataset.triedFavicon = '';
   iconEl.onerror = function () {
+    const homepage = this.dataset.homepage;
+    if (homepage && !this.dataset.triedFavicon) {
+      this.dataset.triedFavicon = 'true';
+      try {
+        const domain = new URL(homepage.startsWith('http') ? homepage : `https://${homepage}`).hostname;
+        this.src = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+        return;
+      } catch {}
+    }
     this.style.display = 'none';
   };
   iconEl.onload = function () {
