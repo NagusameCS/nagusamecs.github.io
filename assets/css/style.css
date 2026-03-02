@@ -1478,42 +1478,34 @@ section {
   white-space: nowrap;
 }
 
-/* ===== CONTACT ===== */
-#contact { background: var(--bg-secondary); }
-.contact-content {
-  text-align: center;
-}
-.contact-content > p {
-  color: var(--text-secondary);
-  font-size: 1rem;
-  margin-bottom: 2rem;
-}
-.contact-links {
+/* ===== HERO SOCIAL BUTTONS ===== */
+.hero-socials {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
+  margin-top: 0.5rem;
 }
-.contact-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px 28px;
+.social-btn {
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: all var(--transition);
-  color: var(--text-primary);
-  min-width: 240px;
   justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
 }
-.contact-card:hover {
-  border-color: #444;
+.social-btn:hover {
+  color: var(--text-primary);
+  border-color: #555;
+  background: rgba(255,255,255,0.06);
   opacity: 1;
 }
-.contact-card i {
-  font-size: 1.1rem;
-  color: var(--text-muted);
+.social-btn svg {
+  width: 20px;
+  height: 20px;
 }
 
 /* ===== FOOTER ===== */
@@ -1598,8 +1590,6 @@ footer {
 
 @media (max-width: 480px) {
   .hero-meta { flex-direction: column; gap: 8px; }
-  .contact-links { flex-direction: column; align-items: stretch; }
-  .contact-card { min-width: unset; }
 }
 
 /* Scrollbar */
