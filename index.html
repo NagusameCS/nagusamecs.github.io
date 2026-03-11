@@ -19,12 +19,15 @@
         <i class="fas fa-bars"></i>
       </button>
       <ul class="nav-links">
-        <li><a href="#experience">Skills &amp; Experience</a></li>
-        <li><a href="#contract">Services</a></li>
-        <li><a href="#repositories">Projects</a></li>
-        <li><a href="#collaborations">Collaborations</a></li>
-        <li><a href="#store-apps">Apps &amp; Extensions</a></li>
-        <li><a href="#activity">Activity</a></li>
+        <li><a href="#" class="nav-tab active" data-tab="tab-main">Portfolio</a></li>
+        <li><a href="#" class="nav-tab" data-tab="tab-projects">Projects</a></li>
+        <li class="nav-sep">|</li>
+        <li class="nav-section-links" data-for="tab-main"><a href="#experience">Skills &amp; Experience</a></li>
+        <li class="nav-section-links" data-for="tab-main"><a href="#contract">Services</a></li>
+        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#repositories">Projects</a></li>
+        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#collaborations">Collaborations</a></li>
+        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#store-apps">Apps &amp; Extensions</a></li>
+        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#activity">Activity</a></li>
       </ul>
     </div>
   </nav>
@@ -63,6 +66,9 @@
 
     </div>
   </section>
+
+  <!-- Tab: Portfolio (default) -->
+  <div id="tab-main" class="tab-group active">
 
   <!-- Skills & Experience Section -->
   <section id="experience">
@@ -908,6 +914,11 @@
     </div>
   </section>
 
+  </div><!-- /tab-main -->
+
+  <!-- Tab: Projects -->
+  <div id="tab-projects" class="tab-group">
+
   <!-- Repositories Section -->
   <section id="repositories">
     <div class="container">
@@ -1027,6 +1038,7 @@
     </div>
   </section>
 
+  </div><!-- /tab-projects -->
 
   <!-- Footer -->
   <footer>

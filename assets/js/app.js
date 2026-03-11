@@ -936,11 +936,47 @@ function setupNav() {
     document.querySelector('.nav-links').classList.toggle('open');
   });
   // Close mobile nav on link click
-  document.querySelectorAll('.nav-links a').forEach(a => {
+  document.querySelectorAll('.nav-links a:not(.nav-tab)').forEach(a => {
     a.addEventListener('click', () => {
       document.querySelector('.nav-links').classList.remove('open');
     });
   });
+
+  // Tab switching
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = tab.dataset.tab;
+
+      // Switch active tab button
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      // Switch visible section links in nav
+      document.querySelectorAll('.nav-section-links').forEach(li => {
+        li.style.display = li.dataset.for === target ? '' : 'none';
+      });
+
+      // Switch visible tab groups
+      document.querySelectorAll('.tab-group').forEach(g => g.classList.remove('active'));
+      const group = document.getElementById(target);
+      if (group) group.classList.add('active');
+
+      // Scroll to top of the first section in the new tab
+      const firstSection = group && group.querySelector('section[id]');
+      if (firstSection) {
+        firstSection.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      // Reveal fade-in elements that missed IntersectionObserver while hidden
+      if (group) {
+        group.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
+      }
+
+      document.querySelector('.nav-links').classList.remove('open');
+    });
+  });
+
   // Active link highlighting
   const sections = document.querySelectorAll('section[id]');
   window.addEventListener('scroll', () => {
@@ -950,7 +986,7 @@ function setupNav() {
       const height = section.offsetHeight;
       const id = section.getAttribute('id');
       const link = document.querySelector(`.nav-links a[href="#${id}"]`);
-      if (link) {
+      if (link && !link.classList.contains('nav-tab')) {
         if (scrollY >= top && scrollY < top + height) link.classList.add('active');
         else link.classList.remove('active');
       }
