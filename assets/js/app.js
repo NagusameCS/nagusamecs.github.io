@@ -3,56 +3,6 @@
  * Pulls data live from GitHub API, config JSONs, and store APIs.
  */
 
-// ===== INTRO ANIMATION =====
-(function runIntro() {
-  const overlay = document.getElementById('intro-overlay');
-  const slash = document.getElementById('intro-slash');
-  if (!overlay || !slash) return;
-
-  document.body.classList.add('intro-active');
-
-  // Diagonal length from top-right to bottom-left
-  const diag = Math.hypot(window.innerWidth, window.innerHeight);
-  const angle = Math.atan2(window.innerHeight, window.innerWidth) * (180 / Math.PI);
-
-  // Position the slash at top-right, rotated toward bottom-left
-  slash.style.transform = `rotate(-${angle}deg)`;
-  slash.style.width = '0px';
-  slash.style.height = '0.5px';
-
-  // Phase 1: Razor-thin line slashes all the way across — stays thin
-  requestAnimationFrame(() => {
-    slash.style.transition = 'width 0.15s cubic-bezier(0.12, 0, 0.39, 0)';
-    slash.style.width = diag + 'px';
-  });
-
-  // Phase 2: Line reached the end — now expand to fill the screen
-  slash.addEventListener('transitionend', function onSlash(e) {
-    if (e.propertyName !== 'width') return;
-    slash.removeEventListener('transitionend', onSlash);
-
-    // Expand the slash into a full diagonal rectangle
-    slash.style.transition = 'height 0.22s cubic-bezier(0.33, 1, 0.68, 1)';
-    slash.style.height = diag + 'px';
-
-    // Once expansion finishes, snap overlay to black and fade out
-    slash.addEventListener('transitionend', function onExpand(e2) {
-      if (e2.propertyName !== 'height') return;
-      slash.removeEventListener('transitionend', onExpand);
-
-      overlay.classList.add('to-black');
-
-      // Wait one frame for black to paint, then fade
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          overlay.classList.add('fade-out');
-          document.body.classList.remove('intro-active');
-          overlay.addEventListener('animationend', () => overlay.remove());
-        });
-      });
-    });
-  });
-})();
 
 const GH_USER = 'NagusameCS';
 const GH_API = 'https://api.github.com';
