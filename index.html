@@ -20,12 +20,12 @@
       </button>
       <ul class="nav-links">
         <li><a href="#experience">Skills &amp; Experience</a></li>
-        <li><a href="#contract">Services</a></li>
         <li><a href="#repositories">Projects</a></li>
         <li><a href="#collaborations">Collaborations</a></li>
         <li><a href="#store-apps">Apps &amp; Extensions</a></li>
         <li><a href="#awards">Awards</a></li>
         <li><a href="#activity">Activity</a></li>
+        <li><a href="#contract">Services</a></li>
       </ul>
       <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light mode">
         <i class="fas fa-sun"></i>
@@ -76,8 +76,7 @@
   <!-- Skills & Experience Section -->
   <section id="experience">
     <div class="container">
-      <h2 class="section-title section-toggle" data-target="experience-content"><span>Skills, Languages &amp; Experience</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="experience-content" class="section-collapsible collapsed">
+      <h2 class="section-title"><span>Skills, Languages &amp; Experience</span></h2>
       <div class="skills-experience-row">
       <div class="skills-grid">
         <div class="skill-category">
@@ -194,19 +193,172 @@
         <div id="languages-chart" class="languages-chart"></div>
       </div>
       </div><!-- end skills-experience-row -->
-      </div><!-- end section-collapsible -->
     </div>
   </section>
 
-  <!-- Contract Section -->
+  <!-- Repositories Section -->
+  <section id="repositories">
+    <div class="container">
+      <h2 class="section-title"><span><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></span></h2>
+      <div class="repo-controls">
+        <div class="repo-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="source">Original</button>
+          <button class="filter-btn" data-filter="fork">Forked</button>
+        </div>
+        <div class="repo-view-toggle">
+          <button class="view-btn active" data-view="grid" title="Grid view"><i class="fas fa-th"></i></button>
+          <button class="view-btn" data-view="expanded" title="Expanded view"><i class="fas fa-bars"></i></button>
+        </div>
+      </div>
+      <div class="repo-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="repo-search" placeholder="Search projects...">
+      </div>
+      <div id="repo-grid" class="repo-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading repositories...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Repository Modal -->
+  <div id="repo-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <img id="modal-icon" class="modal-icon" src="" alt="">
+        <div>
+          <h2 id="modal-title"></h2>
+          <span id="modal-language" class="modal-language"></span>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="overview">Overview</button>
+        <button class="modal-tab" data-tab="readme">README</button>
+        <button class="modal-tab" data-tab="releases">Releases</button>
+        <button class="modal-tab" data-tab="license">License</button>
+        <div class="modal-tab-chevrons">
+          <button class="modal-chevron modal-chevron-left" aria-label="Previous tab"><i class="fas fa-chevron-left"></i></button>
+          <button class="modal-chevron modal-chevron-right" aria-label="Next tab"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Tab: Overview -->
+      <div id="modal-tab-overview" class="modal-tab-content active">
+        <img id="modal-social-preview" class="modal-social-preview" src="" alt="Social Preview">
+        <p id="modal-description" class="modal-description"></p>
+        <div id="modal-languages-detail" class="modal-languages-detail"></div>
+        <div id="modal-stats" class="modal-stats"></div>
+        <div id="modal-topics" class="modal-topics"></div>
+        <div class="modal-actions">
+          <a id="modal-link" href="" target="_blank" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
+          <a id="modal-homepage" href="" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        </div>
+      </div>
+
+      <!-- Tab: README -->
+      <div id="modal-tab-readme" class="modal-tab-content">
+        <div id="modal-readme-body" class="modal-readme-body">
+          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>
+        </div>
+      </div>
+
+      <!-- Tab: Releases -->
+      <div id="modal-tab-releases" class="modal-tab-content">
+        <div id="modal-releases-body" class="modal-releases-body">
+          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading releases...</div>
+        </div>
+      </div>
+
+      <!-- Tab: License -->
+      <div id="modal-tab-license" class="modal-tab-content">
+        <div id="modal-license-body" class="modal-license-body">
+          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading license...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collaborations Section -->
+  <section id="collaborations">
+    <div class="container">
+      <h2 class="section-title"><span>Collaborations</span></h2>
+      <div id="collab-grid" class="collab-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Store Apps Section -->
+  <section id="store-apps">
+    <div class="container">
+      <h2 class="section-title"><span>Apps &amp; Extensions</span></h2>
+      <div id="store-grid" class="store-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Awards Section -->
+  <section id="awards">
+    <div class="container">
+      <h2 class="section-title"><span>Awards &amp; Publications</span></h2>
+      <div class="awards-grid">
+        <div class="award-card">
+          <i class="fas fa-trophy"></i>
+          <h3>Presidential Award for Educational Achievement</h3>
+          <p>In recognition of Outstanding Academic Achievement (2024)</p>
+        </div>
+
+        <div class="award-card">
+          <i class="fas fa-award"></i>
+          <h3>AP Scholar Award</h3>
+          <p>Outstanding college-level achievement on AP Exams</p>
+        </div>
+        <div class="award-card">
+          <i class="fas fa-trophy"></i>
+          <h3>ACSL Finalist</h3>
+          <p>Junior and Senior League Finalist</p>
+        </div>
+        <div class="award-card">
+          <i class="fas fa-laptop-code"></i>
+          <h3>Computer Science Award</h3>
+          <p>ASF &mdash; sole recipient for exceptional performance</p>
+        </div>
+        <div class="award-card">
+          <i class="fas fa-paint-brush"></i>
+          <h3>Design Award</h3>
+          <p>ASF &mdash; sole recipient for exceptional performance</p>
+        </div>
+        <div class="award-card">
+          <i class="fas fa-gavel"></i>
+          <h3>MUN Best Witness</h3>
+          <p>Sole recipient for exceptional role portrayal in ICC simulations</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activity Section -->
+  <section id="activity">
+    <div class="container">
+      <h2 class="section-title"><span>GitHub Activity</span></h2>
+      <div id="contribution-graph" class="contribution-graph">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity...</div>
+      </div>
+      <div id="recent-activity" class="recent-activity">
+        <h3>Recent Activity</h3>
+        <ul id="activity-feed" class="activity-feed"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services & Rates Section -->
   <section id="contract">
     <div class="container">
-      <h2 class="section-title section-toggle" data-target="contract-content"><span>Services &amp; Rates</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="contract-content" class="section-collapsible collapsed">
-        <div class="contract-availability">
-          <span class="availability-dot"></span>
-          <span class="availability-text">Currently accepting new clients</span>
-        </div>
+      <h2 class="section-title"><span>Services &amp; Rates</span></h2>
         <p class="contract-intro">Available for freelance and contract work. All rates are hourly unless otherwise noted. <span class="currency-note">Showing in <strong id="currency-label">USD</strong> &mdash; <button id="currency-toggle" class="currency-toggle-btn">Change currency</button></span></p>
         <div class="currency-selector" id="currency-selector" style="display:none;">
           <button class="currency-btn active" data-currency="USD">USD $</button>
@@ -331,6 +483,118 @@
               <div class="sub-service"><span>Security Consultation</span><span class="service-rate" data-rate="50">/hr</span></div>
             </div>
           </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-brain"></i>
+              <h3>Data Science &amp; ML</h3>
+              <p>Machine learning models, data pipelines, analysis, and visualization.</p>
+              <span class="service-rate" data-rate="65">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Model Training &amp; Tuning</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>Data Analysis &amp; Viz</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Pipeline Development</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>NLP / Computer Vision</span><span class="service-rate" data-rate="75">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-robot"></i>
+              <h3>Automation &amp; Scripting</h3>
+              <p>Custom scripts, workflow automation, CI/CD pipelines, and task scheduling.</p>
+              <span class="service-rate" data-rate="45">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>CI/CD Setup</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Shell / Python Scripting</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Workflow Automation</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Web Scraping</span><span class="service-rate" data-rate="35">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-database"></i>
+              <h3>Database Administration</h3>
+              <p>Database design, optimization, migration, and maintenance for SQL &amp; NoSQL systems.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Schema Design</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Query Optimization</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Migration &amp; ETL</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Backup &amp; Recovery</span><span class="service-rate" data-rate="40">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-chalkboard-teacher"></i>
+              <h3>Tutoring &amp; Mentoring</h3>
+              <p>One-on-one programming lessons, CS coursework help, and career mentoring.</p>
+              <span class="service-rate" data-rate="35">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Programming Lessons</span><span class="service-rate" data-rate="35">/hr</span></div>
+              <div class="sub-service"><span>CS Coursework Help</span><span class="service-rate" data-rate="30">/hr</span></div>
+              <div class="sub-service"><span>Interview Prep</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Career Mentoring</span><span class="service-rate" data-rate="35">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-pen-fancy"></i>
+              <h3>Technical Writing</h3>
+              <p>Documentation, README files, API docs, tutorials, and developer guides.</p>
+              <span class="service-rate" data-rate="35">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>API Documentation</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>README / Guides</span><span class="service-rate" data-rate="30">/hr</span></div>
+              <div class="sub-service"><span>Tutorial Writing</span><span class="service-rate" data-rate="35">/hr</span></div>
+              <div class="sub-service"><span>Technical Blog Posts</span><span class="service-rate" data-rate="30">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-comment-dots"></i>
+              <h3>Bot Development</h3>
+              <p>Discord bots, Telegram bots, Slack integrations, and custom chatbot solutions.</p>
+              <span class="service-rate" data-rate="45">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Discord Bot</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Telegram Bot</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Slack Integration</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>AI Chatbot</span><span class="service-rate" data-rate="55">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-cloud"></i>
+              <h3>Cloud &amp; DevOps</h3>
+              <p>Cloud infrastructure setup, containerization, monitoring, and deployment automation.</p>
+              <span class="service-rate" data-rate="55">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Docker / Containers</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>AWS / GCP / Azure</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>Monitoring Setup</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Infrastructure as Code</span><span class="service-rate" data-rate="55">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-gamepad"></i>
+              <h3>Game Development</h3>
+              <p>2D/3D game prototypes, game logic, and Unity or Godot development.</p>
+              <span class="service-rate" data-rate="55">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Prototype / MVP</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Game Logic &amp; Scripting</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>UI / HUD Design</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Multiplayer Networking</span><span class="service-rate" data-rate="65">/hr</span></div>
+            </div>
+          </div>
         </div>
         </div>
         <div class="rate-panel" id="panel-project">
@@ -404,6 +668,54 @@
                 <li>1 round of revisions</li>
               </ul>
             </div>
+            <div class="project-rate-card">
+              <i class="fas fa-robot"></i>
+              <h3>Bot / Automation</h3>
+              <p>Custom Discord, Telegram, or Slack bot with hosting setup.</p>
+              <div class="project-price"><span class="service-rate" data-rate="400" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Custom commands</li>
+                <li>API integrations</li>
+                <li>Hosting &amp; deployment</li>
+                <li>1 round of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-brain"></i>
+              <h3>ML Model / Data Pipeline</h3>
+              <p>Trained machine learning model or automated data processing pipeline.</p>
+              <div class="project-price"><span class="service-rate" data-rate="2000" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Data preprocessing</li>
+                <li>Model training &amp; eval</li>
+                <li>Deployment-ready output</li>
+                <li>Documentation</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-cloud"></i>
+              <h3>Cloud Infrastructure</h3>
+              <p>Full cloud environment setup with CI/CD, monitoring, and IaC.</p>
+              <div class="project-price"><span class="service-rate" data-rate="1200" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Cloud provider setup</li>
+                <li>CI/CD pipeline</li>
+                <li>Monitoring &amp; alerts</li>
+                <li>IaC templates</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-gamepad"></i>
+              <h3>Game Prototype</h3>
+              <p>Playable 2D/3D game prototype with core mechanics and basic art.</p>
+              <div class="project-price"><span class="service-rate" data-rate="1800" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Core gameplay loop</li>
+                <li>Basic UI / HUD</li>
+                <li>Placeholder art</li>
+                <li>Build for 1 platform</li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="contract-cta">
@@ -411,176 +723,6 @@
           <a href="mailto:nagusamecs@gmail.com?subject=Contract%20Inquiry&body=Hi%2C%20I'm%20interested%20in%20your%20services.%0A%0AService%3A%20%0ABudget%3A%20%0ATimeline%3A%20%0ADetails%3A%20" class="cta-btn"><i class="fas fa-paper-plane"></i> Request a Quote</a>
         </div>
         <p class="contract-note">All project rates are estimates &mdash; final pricing depends on scope and complexity. <a href="mailto:nagusamecs@gmail.com">Get in touch</a> for a custom quote.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Repositories Section -->
-  <section id="repositories">
-    <div class="container">
-      <h2 class="section-title section-toggle" data-target="repositories-content"><span><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="repositories-content" class="section-collapsible collapsed">
-      <div class="repo-controls">
-        <div class="repo-filters">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="source">Original</button>
-          <button class="filter-btn" data-filter="fork">Forked</button>
-        </div>
-        <div class="repo-view-toggle">
-          <button class="view-btn active" data-view="grid" title="Grid view"><i class="fas fa-th"></i></button>
-          <button class="view-btn" data-view="expanded" title="Expanded view"><i class="fas fa-bars"></i></button>
-        </div>
-      </div>
-      <div class="repo-search">
-        <i class="fas fa-search"></i>
-        <input type="text" id="repo-search" placeholder="Search projects...">
-      </div>
-      <div id="repo-grid" class="repo-grid">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading repositories...</div>
-      </div>
-      </div><!-- end section-collapsible -->
-    </div>
-  </section>
-
-  <!-- Repository Modal -->
-  <div id="repo-modal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close">&times;</button>
-      <div class="modal-header">
-        <img id="modal-icon" class="modal-icon" src="" alt="">
-        <div>
-          <h2 id="modal-title"></h2>
-          <span id="modal-language" class="modal-language"></span>
-        </div>
-      </div>
-
-      <!-- Tab Navigation -->
-      <div class="modal-tabs">
-        <button class="modal-tab active" data-tab="overview">Overview</button>
-        <button class="modal-tab" data-tab="readme">README</button>
-        <button class="modal-tab" data-tab="releases">Releases</button>
-        <button class="modal-tab" data-tab="license">License</button>
-        <div class="modal-tab-chevrons">
-          <button class="modal-chevron modal-chevron-left" aria-label="Previous tab"><i class="fas fa-chevron-left"></i></button>
-          <button class="modal-chevron modal-chevron-right" aria-label="Next tab"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-
-      <!-- Tab: Overview -->
-      <div id="modal-tab-overview" class="modal-tab-content active">
-        <img id="modal-social-preview" class="modal-social-preview" src="" alt="Social Preview">
-        <p id="modal-description" class="modal-description"></p>
-        <div id="modal-languages-detail" class="modal-languages-detail"></div>
-        <div id="modal-stats" class="modal-stats"></div>
-        <div id="modal-topics" class="modal-topics"></div>
-        <div class="modal-actions">
-          <a id="modal-link" href="" target="_blank" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
-          <a id="modal-homepage" href="" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-        </div>
-      </div>
-
-      <!-- Tab: README -->
-      <div id="modal-tab-readme" class="modal-tab-content">
-        <div id="modal-readme-body" class="modal-readme-body">
-          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>
-        </div>
-      </div>
-
-      <!-- Tab: Releases -->
-      <div id="modal-tab-releases" class="modal-tab-content">
-        <div id="modal-releases-body" class="modal-releases-body">
-          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading releases...</div>
-        </div>
-      </div>
-
-      <!-- Tab: License -->
-      <div id="modal-tab-license" class="modal-tab-content">
-        <div id="modal-license-body" class="modal-license-body">
-          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading license...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Collaborations Section -->
-  <section id="collaborations">
-    <div class="container">
-      <h2 class="section-title section-toggle" data-target="collaborations-content"><span>Collaborations</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="collaborations-content" class="section-collapsible collapsed">
-      <div id="collab-grid" class="collab-grid">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
-      </div>
-      </div><!-- end section-collapsible -->
-    </div>
-  </section>
-
-  <!-- Store Apps Section -->
-  <section id="store-apps">
-    <div class="container">
-      <h2 class="section-title section-toggle" data-target="store-content"><span>Apps &amp; Extensions</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="store-content" class="section-collapsible collapsed">
-      <div id="store-grid" class="store-grid">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
-      </div>
-      </div><!-- end section-collapsible -->
-    </div>
-  </section>
-
-  <!-- Awards Section -->
-  <section id="awards">
-    <div class="container">
-      <h2 class="section-title section-toggle" data-target="awards-content"><span>Awards &amp; Publications</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="awards-content" class="section-collapsible collapsed">
-      <div class="awards-grid">
-        <div class="award-card">
-          <i class="fas fa-trophy"></i>
-          <h3>Presidential Award for Educational Achievement</h3>
-          <p>In recognition of Outstanding Academic Achievement (2024)</p>
-        </div>
-
-        <div class="award-card">
-          <i class="fas fa-award"></i>
-          <h3>AP Scholar Award</h3>
-          <p>Outstanding college-level achievement on AP Exams</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-trophy"></i>
-          <h3>ACSL Finalist</h3>
-          <p>Junior and Senior League Finalist</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-laptop-code"></i>
-          <h3>Computer Science Award</h3>
-          <p>ASF &mdash; sole recipient for exceptional performance</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-paint-brush"></i>
-          <h3>Design Award</h3>
-          <p>ASF &mdash; sole recipient for exceptional performance</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-gavel"></i>
-          <h3>MUN Best Witness</h3>
-          <p>Sole recipient for exceptional role portrayal in ICC simulations</p>
-        </div>
-      </div>
-      </div><!-- end section-collapsible -->
-    </div>
-  </section>
-
-  <!-- Activity Section -->
-  <section id="activity">
-    <div class="container">
-      <h2 class="section-title section-toggle" data-target="activity-content"><span>GitHub Activity</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
-      <div id="activity-content" class="section-collapsible collapsed">
-      <div id="contribution-graph" class="contribution-graph">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity...</div>
-      </div>
-      <div id="recent-activity" class="recent-activity">
-        <h3>Recent Activity</h3>
-        <ul id="activity-feed" class="activity-feed"></ul>
-      </div>
-      </div><!-- end section-collapsible -->
     </div>
   </section>
 

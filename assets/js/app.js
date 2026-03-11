@@ -998,7 +998,6 @@ async function init() {
   setupNav();
   setupModal();
   setupFilters();
-  setupCollapsibleSections();
   setupCurrencyConversion();
   setupServiceCardToggle();
   setupRateTabs();
@@ -1018,57 +1017,6 @@ async function init() {
 }
 
 init();
-
-// ===== COLLAPSIBLE SECTIONS =====
-function setupCollapsibleSections() {
-  document.querySelectorAll('.section-toggle').forEach(toggle => {
-    toggle.addEventListener('click', (e) => {
-      // Don't toggle if clicking a link inside the title
-      if (e.target.closest('a')) return;
-      const targetId = toggle.dataset.target;
-      const content = document.getElementById(targetId);
-      if (!content) return;
-      const isCollapsed = content.classList.contains('collapsed');
-      if (isCollapsed) {
-        content.classList.remove('collapsed');
-        toggle.classList.add('expanded');
-        // Set max-height to scrollHeight for smooth animation
-        content.style.maxHeight = content.scrollHeight + 'px';
-        setTimeout(() => { content.style.maxHeight = ''; }, 600);
-      } else {
-        content.style.maxHeight = content.scrollHeight + 'px';
-        requestAnimationFrame(() => {
-          content.classList.add('collapsed');
-          toggle.classList.remove('expanded');
-          content.style.maxHeight = '';
-        });
-      }
-    });
-  });
-
-  // Auto-expand section when navigating via hash or nav links
-  function expandFromHash() {
-    const hash = window.location.hash;
-    if (!hash) return;
-    const section = document.querySelector(hash);
-    if (!section) return;
-    const toggle = section.querySelector('.section-toggle');
-    const targetId = toggle?.dataset.target;
-    const content = targetId ? document.getElementById(targetId) : null;
-    if (content && content.classList.contains('collapsed')) {
-      content.classList.remove('collapsed');
-      if (toggle) toggle.classList.add('expanded');
-    }
-  }
-  window.addEventListener('hashchange', expandFromHash);
-  // Also handle nav link clicks
-  document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
-    link.addEventListener('click', () => {
-      setTimeout(expandFromHash, 50);
-    });
-  });
-  expandFromHash();
-}
 
 // ===== CURRENCY CONVERSION =====
 // ===== SERVICE CARD SUB-SERVICE TOGGLE =====
