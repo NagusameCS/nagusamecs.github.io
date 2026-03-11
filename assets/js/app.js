@@ -3,6 +3,47 @@
  * Pulls data live from GitHub API, config JSONs, and store APIs.
  */
 
+// ===== INTRO ANIMATION =====
+(function runIntro() {
+  const overlay = document.getElementById('intro-overlay');
+  const slash = document.getElementById('intro-slash');
+  if (!overlay || !slash) return;
+
+  document.body.classList.add('intro-active');
+
+  // Diagonal length from top-right to bottom-left
+  const diag = Math.hypot(window.innerWidth, window.innerHeight);
+  const angle = Math.atan2(window.innerHeight, window.innerWidth) * (180 / Math.PI);
+
+  // Position the slash at top-right, rotated toward bottom-left
+  slash.style.transform = `rotate(${angle}deg)`;
+  slash.style.width = '0px';
+
+  // Phase 1: Line shoots across (exponential ease via cubic-bezier)
+  requestAnimationFrame(() => {
+    slash.style.transition = `width 0.45s cubic-bezier(0.16, 1, 0.3, 1)`;
+    slash.style.width = diag + 'px';
+  });
+
+  // Phase 2: Line expands into rectangle covering the page
+  setTimeout(() => {
+    slash.style.transition = 'height 0.25s cubic-bezier(0.22, 1, 0.36, 1)';
+    slash.style.height = diag + 'px';
+  }, 460);
+
+  // Phase 3: Fade out the black overlay to reveal the site
+  setTimeout(() => {
+    overlay.style.background = 'transparent';
+    overlay.classList.add('fade-out');
+    document.body.classList.remove('intro-active');
+  }, 720);
+
+  // Clean up
+  setTimeout(() => {
+    overlay.remove();
+  }, 1050);
+})();
+
 const GH_USER = 'NagusameCS';
 const GH_API = 'https://api.github.com';
 const CONFIG_BASE = 'config';

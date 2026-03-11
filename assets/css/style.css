@@ -31,6 +31,33 @@ body {
   line-height: 1.6;
   overflow-x: hidden;
 }
+body.intro-active {
+  overflow: hidden;
+}
+
+/* ===== INTRO ANIMATION ===== */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #fff;
+  pointer-events: none;
+}
+#intro-overlay.fade-out {
+  animation: introFade 0.3s ease-out forwards;
+}
+@keyframes introFade {
+  to { opacity: 0; }
+}
+#intro-slash {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 3px;
+  background: #000;
+  transform-origin: top right;
+}
 
 a { color: var(--text-primary); text-decoration: none; transition: opacity var(--transition); }
 a:hover { opacity: 0.7; }
