@@ -169,28 +169,6 @@ section {
   cursor: pointer;
 }
 
-/* Theme Toggle */
-.theme-toggle {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.85rem;
-  transition: all var(--transition);
-  margin-left: 12px;
-  flex-shrink: 0;
-}
-.theme-toggle:hover {
-  color: var(--text-primary);
-  border-color: var(--text-primary);
-}
-
 /* ===== HERO ===== */
 #hero {
   min-height: 100vh;
@@ -1681,7 +1659,7 @@ footer {
     padding: 12px;
   }
   .nav-links.open { display: flex; }
-  .nav-toggle { display: block; }\n  .theme-toggle { position: absolute; right: 48px; }
+  .nav-toggle { display: block; }
 
   #hero h1 { font-size: 1.75rem; }
   .hero-avatar { width: 90px; height: 90px; }
@@ -2068,57 +2046,3 @@ footer {
   opacity: 0.85;
 }
 
-/* ===== LIGHT MODE ===== */
-.theme-transition-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  z-index: 99998;
-  pointer-events: none;
-  transition: none;
-}
-.theme-transition-overlay.expanding {
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-body.light-mode {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f6f6f6;
-  --bg-tertiary: #eeeeee;
-  --bg-card: #f6f6f6;
-  --border: #dddddd;
-  --text-primary: #111111;
-  --text-secondary: #555555;
-  --text-muted: #888888;
-  --accent: #111111;
-  --accent-hover: #333333;
-}
-body.light-mode #navbar {
-  background: rgba(255, 255, 255, 0.9);
-}
-body.light-mode .social-btn {
-  background: rgba(255, 255, 255, 0.85);
-}
-body.light-mode .heatmap-chart rect.heatmap-cell {
-  stroke: rgba(0, 0, 0, 0.06);
-}
-body.light-mode .heatmap-chart rect.heatmap-cell:hover {
-  stroke: rgba(0, 0, 0, 0.25);
-}
-body.light-mode .heatmap-tooltip {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: #ccc;
-  color: #111;
-}
-body.light-mode .markdown-body pre {
-  background: #f0f0f0;
-}
-body.light-mode .markdown-body code {
-  background: rgba(0, 0, 0, 0.06);
-}
-body.light-mode ::-webkit-scrollbar-track { background: #fff; }
-body.light-mode ::-webkit-scrollbar-thumb { background: #ccc; }
-body.light-mode ::-webkit-scrollbar-thumb:hover { background: #aaa; }

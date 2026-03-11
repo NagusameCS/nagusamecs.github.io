@@ -1002,7 +1002,6 @@ async function init() {
   setupServiceCardToggle();
   setupRateTabs();
   setupRushToggle();
-  setupThemeToggle();
 
   // Load everything in parallel
   await Promise.allSettled([
@@ -1118,77 +1117,6 @@ function setupRushToggle() {
     // Re-run currency conversion with current currency to apply/remove multiplier
     const activeBtn = document.querySelector('.currency-btn.active');
     if (activeBtn) activeBtn.click();
-  });
-}
-
-// ===== LIGHT MODE TOGGLE =====
-function setupThemeToggle() {
-  const toggle = document.getElementById('theme-toggle');
-  const overlay = document.getElementById('theme-transition-overlay');
-  if (!toggle || !overlay) return;
-
-  // Check saved preference
-  const saved = localStorage.getItem('theme');
-  if (saved === 'light') {
-    document.body.classList.add('light-mode');
-    toggle.innerHTML = '<i class="fas fa-moon"></i>';
-  }
-
-  toggle.addEventListener('click', (e) => {
-    const isLight = document.body.classList.contains('light-mode');
-    const newBg = isLight ? '#000000' : '#ffffff';
-
-    // Get click position for the spread origin
-    const rect = toggle.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top + rect.height / 2;
-
-    // Calculate the maximum distance from click to any corner
-    const maxDist = Math.max(
-      Math.hypot(x, y),
-      Math.hypot(window.innerWidth - x, y),
-      Math.hypot(x, window.innerHeight - y),
-      Math.hypot(window.innerWidth - x, window.innerHeight - y)
-    );
-
-    // Set up overlay
-    overlay.style.background = newBg;
-    overlay.style.left = x + 'px';
-    overlay.style.top = y + 'px';
-    overlay.style.width = '0';
-    overlay.style.height = '0';
-    overlay.style.transform = 'translate(-50%, -50%) scale(1)';
-    overlay.style.borderRadius = '50%';
-
-    // Force reflow
-    overlay.offsetHeight;
-
-    // Expand
-    const diameter = maxDist * 2.2;
-    overlay.style.width = diameter + 'px';
-    overlay.style.height = diameter + 'px';
-    overlay.classList.add('expanding');
-    overlay.style.transform = 'translate(-50%, -50%) scale(1)';
-
-    // Midway through animation, toggle the theme
-    setTimeout(() => {
-      if (isLight) {
-        document.body.classList.remove('light-mode');
-        toggle.innerHTML = '<i class="fas fa-sun"></i>';
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.body.classList.add('light-mode');
-        toggle.innerHTML = '<i class="fas fa-moon"></i>';
-        localStorage.setItem('theme', 'light');
-      }
-    }, 350);
-
-    // Clean up overlay
-    setTimeout(() => {
-      overlay.classList.remove('expanding');
-      overlay.style.width = '0';
-      overlay.style.height = '0';
-    }, 800);
   });
 }
 
