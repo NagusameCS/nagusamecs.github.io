@@ -43,6 +43,10 @@ body.intro-active {
   background: #fff;
   pointer-events: none;
 }
+#intro-overlay.to-black {
+  transition: background 0.15s ease;
+  background: #000;
+}
 #intro-overlay.fade-out {
   animation: introFade 0.3s ease-out forwards;
 }
@@ -54,7 +58,7 @@ body.intro-active {
   top: 0;
   right: 0;
   width: 0;
-  height: 3px;
+  height: 1px;
   background: #000;
   transform-origin: top right;
 }
