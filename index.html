@@ -20,12 +20,11 @@
       </button>
       <ul class="nav-links">
         <li><a href="#experience">Skills &amp; Experience</a></li>
+        <li><a href="#contract">Services</a></li>
         <li><a href="#repositories">Projects</a></li>
         <li><a href="#collaborations">Collaborations</a></li>
         <li><a href="#store-apps">Apps &amp; Extensions</a></li>
-        <li><a href="#awards">Awards</a></li>
         <li><a href="#activity">Activity</a></li>
-        <li><a href="#contract">Services</a></li>
       </ul>
     </div>
   </nav>
@@ -136,6 +135,13 @@
       </div>
       <div class="timeline">
         <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-code-branch"></i></div>
+          <div class="timeline-content">
+            <h3>Founded <a href="https://opencs.dev" target="_blank">OpenCS.dev</a></h3>
+            <p>Open-source development team building free tools and experimental projects &mdash; everything is open source and free to use</p>
+          </div>
+        </div>
+        <div class="timeline-item">
           <div class="timeline-icon"><i class="fas fa-school"></i></div>
           <div class="timeline-content">
             <h3>Head of CS Wing &mdash; GAMMA ASF</h3>
@@ -177,176 +183,11 @@
             <p>10 years, training under Olympic-level coach</p>
           </div>
         </div>
-        <div class="timeline-item">
-          <div class="timeline-icon"><i class="fas fa-globe"></i></div>
-          <div class="timeline-content">
-            <h3>Founded OpenCS.dev</h3>
-            <p>Free educational platform for AP &amp; IB computer science students</p>
-          </div>
-        </div>
       </div>
       </div><!-- end skills-experience-row -->
     </div>
   </section>
 
-  <!-- Repositories Section -->
-  <section id="repositories">
-    <div class="container">
-      <h2 class="section-title"><span><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></span></h2>
-      <div class="repo-controls">
-        <div class="repo-filters">
-          <button class="filter-btn active" data-filter="all">All</button>
-          <button class="filter-btn" data-filter="source">Original</button>
-          <button class="filter-btn" data-filter="fork">Forked</button>
-        </div>
-        <div class="repo-view-toggle">
-          <button class="view-btn active" data-view="grid" title="Grid view"><i class="fas fa-th"></i></button>
-          <button class="view-btn" data-view="expanded" title="Expanded view"><i class="fas fa-bars"></i></button>
-        </div>
-      </div>
-      <div class="repo-search">
-        <i class="fas fa-search"></i>
-        <input type="text" id="repo-search" placeholder="Search projects...">
-      </div>
-      <div id="repo-grid" class="repo-grid">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading repositories...</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Repository Modal -->
-  <div id="repo-modal" class="modal">
-    <div class="modal-content">
-      <button class="modal-close">&times;</button>
-      <div class="modal-header">
-        <img id="modal-icon" class="modal-icon" src="" alt="">
-        <div>
-          <h2 id="modal-title"></h2>
-          <span id="modal-language" class="modal-language"></span>
-        </div>
-      </div>
-
-      <!-- Tab Navigation -->
-      <div class="modal-tabs">
-        <button class="modal-tab active" data-tab="overview">Overview</button>
-        <button class="modal-tab" data-tab="readme">README</button>
-        <button class="modal-tab" data-tab="releases">Releases</button>
-        <button class="modal-tab" data-tab="license">License</button>
-        <div class="modal-tab-chevrons">
-          <button class="modal-chevron modal-chevron-left" aria-label="Previous tab"><i class="fas fa-chevron-left"></i></button>
-          <button class="modal-chevron modal-chevron-right" aria-label="Next tab"><i class="fas fa-chevron-right"></i></button>
-        </div>
-      </div>
-
-      <!-- Tab: Overview -->
-      <div id="modal-tab-overview" class="modal-tab-content active">
-        <img id="modal-social-preview" class="modal-social-preview" src="" alt="Social Preview">
-        <p id="modal-description" class="modal-description"></p>
-        <div id="modal-languages-detail" class="modal-languages-detail"></div>
-        <div id="modal-stats" class="modal-stats"></div>
-        <div id="modal-topics" class="modal-topics"></div>
-        <div class="modal-actions">
-          <a id="modal-link" href="" target="_blank" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
-          <a id="modal-homepage" href="" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
-        </div>
-      </div>
-
-      <!-- Tab: README -->
-      <div id="modal-tab-readme" class="modal-tab-content">
-        <div id="modal-readme-body" class="modal-readme-body">
-          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>
-        </div>
-      </div>
-
-      <!-- Tab: Releases -->
-      <div id="modal-tab-releases" class="modal-tab-content">
-        <div id="modal-releases-body" class="modal-releases-body">
-          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading releases...</div>
-        </div>
-      </div>
-
-      <!-- Tab: License -->
-      <div id="modal-tab-license" class="modal-tab-content">
-        <div id="modal-license-body" class="modal-license-body">
-          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading license...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Collaborations Section -->
-  <section id="collaborations">
-    <div class="container">
-      <h2 class="section-title"><span>Collaborations</span></h2>
-      <div id="collab-grid" class="collab-grid">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Store Apps Section -->
-  <section id="store-apps">
-    <div class="container">
-      <h2 class="section-title"><span>Apps &amp; Extensions</span></h2>
-      <div id="store-grid" class="store-grid">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Awards Section -->
-  <section id="awards">
-    <div class="container">
-      <h2 class="section-title"><span>Awards &amp; Publications</span></h2>
-      <div class="awards-grid">
-        <div class="award-card">
-          <i class="fas fa-trophy"></i>
-          <h3>Presidential Award for Educational Achievement</h3>
-          <p>In recognition of Outstanding Academic Achievement (2024)</p>
-        </div>
-
-        <div class="award-card">
-          <i class="fas fa-award"></i>
-          <h3>AP Scholar Award</h3>
-          <p>Outstanding college-level achievement on AP Exams</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-trophy"></i>
-          <h3>ACSL Finalist</h3>
-          <p>Junior and Senior League Finalist</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-laptop-code"></i>
-          <h3>Computer Science Award</h3>
-          <p>ASF &mdash; sole recipient for exceptional performance</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-paint-brush"></i>
-          <h3>Design Award</h3>
-          <p>ASF &mdash; sole recipient for exceptional performance</p>
-        </div>
-        <div class="award-card">
-          <i class="fas fa-gavel"></i>
-          <h3>MUN Best Witness</h3>
-          <p>Sole recipient for exceptional role portrayal in ICC simulations</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Activity Section -->
-  <section id="activity">
-    <div class="container">
-      <h2 class="section-title"><span>GitHub Activity</span></h2>
-      <div id="contribution-graph" class="contribution-graph">
-        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity...</div>
-      </div>
-      <div id="recent-activity" class="recent-activity">
-        <h3>Recent Activity</h3>
-        <ul id="activity-feed" class="activity-feed"></ul>
-      </div>
-    </div>
-  </section>
 
   <!-- Services & Rates Section -->
   <section id="contract">
@@ -367,13 +208,6 @@
           <button class="rate-tab" data-tab="project">Project-Based</button>
         </div>
         <div class="rate-panel active" id="panel-hourly">
-          <div class="rush-toggle-bar">
-            <label class="rush-label">
-              <input type="checkbox" id="rush-toggle">
-              <span class="rush-slider"></span>
-            </label>
-            <span class="rush-text"><i class="fas fa-bolt"></i> Rush / Priority Rate <span class="rush-badge">1.5&times;</span></span>
-          </div>
         <div class="services-grid">
           <div class="service-card expandable">
             <div class="service-card-header">
@@ -588,6 +422,234 @@
               <div class="sub-service"><span>Multiplayer Networking</span><span class="service-rate" data-rate="65">/hr</span></div>
             </div>
           </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-language"></i>
+              <h3>Language Development</h3>
+              <p>Custom programming language design, lexers, parsers, interpreters, and transpilers.</p>
+              <span class="service-rate" data-rate="75">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Language Design &amp; Spec</span><span class="service-rate" data-rate="75">/hr</span></div>
+              <div class="sub-service"><span>Lexer / Parser</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>Interpreter / VM</span><span class="service-rate" data-rate="80">/hr</span></div>
+              <div class="sub-service"><span>Transpiler</span><span class="service-rate" data-rate="65">/hr</span></div>
+              <div class="sub-service"><span>DSL (Domain-Specific Language)</span><span class="service-rate" data-rate="60">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-microchip"></i>
+              <h3>OS &amp; Systems Development</h3>
+              <p>Operating system kernels, drivers, bootloaders, and low-level systems programming.</p>
+              <span class="service-rate" data-rate="80">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Kernel Development</span><span class="service-rate" data-rate="85">/hr</span></div>
+              <div class="sub-service"><span>Driver Development</span><span class="service-rate" data-rate="80">/hr</span></div>
+              <div class="sub-service"><span>Bootloader / Init</span><span class="service-rate" data-rate="75">/hr</span></div>
+              <div class="sub-service"><span>Filesystem Implementation</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>Systems Consulting</span><span class="service-rate" data-rate="65">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-puzzle-piece"></i>
+              <h3>Browser &amp; Web Extensions</h3>
+              <p>Chrome, Firefox, and Safari extensions &mdash; content scripts, popups, background workers.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Chrome Extension</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Firefox Add-on</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Safari Extension</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Cross-Browser Port</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Extension Maintenance</span><span class="service-rate" data-rate="35">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-cogs"></i>
+              <h3>Compiler &amp; Toolchain</h3>
+              <p>Compiler frontends &amp; backends, LLVM passes, code generation, and build system tooling.</p>
+              <span class="service-rate" data-rate="80">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>LLVM Pass / Backend</span><span class="service-rate" data-rate="85">/hr</span></div>
+              <div class="sub-service"><span>Code Generation</span><span class="service-rate" data-rate="80">/hr</span></div>
+              <div class="sub-service"><span>Build System (CMake / Meson)</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Static Analysis Tool</span><span class="service-rate" data-rate="70">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-plug"></i>
+              <h3>API Design &amp; Integration</h3>
+              <p>REST, GraphQL, gRPC, and WebSocket API design, implementation, and third-party integrations.</p>
+              <span class="service-rate" data-rate="55">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>REST API</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>GraphQL API</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>gRPC / Protobuf</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>WebSocket Services</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Third-Party Integration</span><span class="service-rate" data-rate="45">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-memory"></i>
+              <h3>Embedded &amp; IoT</h3>
+              <p>Firmware, microcontroller programming, RTOS, and IoT sensor/actuator systems.</p>
+              <span class="service-rate" data-rate="65">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Firmware Development</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>Arduino / ESP32</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>RTOS Integration</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>Sensor / Actuator Systems</span><span class="service-rate" data-rate="60">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-terminal"></i>
+              <h3>CLI &amp; Developer Tools</h3>
+              <p>Command-line applications, developer utilities, package managers, and build plugins.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>CLI Application</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>VS Code Extension</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>npm / PyPI Package</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Linter / Formatter</span><span class="service-rate" data-rate="55">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-network-wired"></i>
+              <h3>Networking &amp; Protocols</h3>
+              <p>Custom network protocols, socket programming, proxy servers, and packet analysis.</p>
+              <span class="service-rate" data-rate="65">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Custom Protocol Design</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>Socket Programming</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>Proxy / Tunnel Server</span><span class="service-rate" data-rate="65">/hr</span></div>
+              <div class="sub-service"><span>Packet Analysis</span><span class="service-rate" data-rate="60">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-desktop"></i>
+              <h3>Desktop Applications</h3>
+              <p>Cross-platform desktop apps with Electron, Tauri, or native frameworks.</p>
+              <span class="service-rate" data-rate="55">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Electron App</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Tauri App</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Native macOS / Windows</span><span class="service-rate" data-rate="65">/hr</span></div>
+              <div class="sub-service"><span>System Tray / Menu Bar</span><span class="service-rate" data-rate="45">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-project-diagram"></i>
+              <h3>Reverse Engineering</h3>
+              <p>Binary analysis, decompilation, protocol reverse engineering, and malware analysis.</p>
+              <span class="service-rate" data-rate="75">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Binary / Disassembly</span><span class="service-rate" data-rate="80">/hr</span></div>
+              <div class="sub-service"><span>Protocol RE</span><span class="service-rate" data-rate="75">/hr</span></div>
+              <div class="sub-service"><span>Malware Analysis</span><span class="service-rate" data-rate="85">/hr</span></div>
+              <div class="sub-service"><span>Firmware Extraction</span><span class="service-rate" data-rate="70">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-cubes"></i>
+              <h3>Blockchain &amp; Web3</h3>
+              <p>Smart contracts, dApps, token standards, and on-chain data tooling.</p>
+              <span class="service-rate" data-rate="70">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Smart Contract (Solidity)</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>dApp Frontend</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>Token / NFT Standard</span><span class="service-rate" data-rate="65">/hr</span></div>
+              <div class="sub-service"><span>On-Chain Analytics</span><span class="service-rate" data-rate="55">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-video"></i>
+              <h3>Video Production &amp; Editing</h3>
+              <p>Video editing, motion graphics, Manim animations, and YouTube-ready content.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Manim Animation</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Video Editing</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Motion Graphics</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Explainer / Tutorial Video</span><span class="service-rate" data-rate="50">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-bullhorn"></i>
+              <h3>Advertising &amp; Marketing</h3>
+              <p>Digital ads, campaign strategy, social media content, and brand positioning.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Ad Campaign Strategy</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Social Media Content</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Brand / Visual Identity</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Analytics &amp; Optimization</span><span class="service-rate" data-rate="45">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-tasks"></i>
+              <h3>Project Management</h3>
+              <p>Technical project management, sprint planning, team coordination, and delivery consulting.</p>
+              <span class="service-rate" data-rate="55">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Sprint / Agile Planning</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Roadmap &amp; Strategy</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>Team Coordination</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Delivery Consulting</span><span class="service-rate" data-rate="50">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-drafting-compass"></i>
+              <h3>CAD Design</h3>
+              <p>2D/3D CAD modeling, technical drawings, product design, and prototyping files.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>3D Modeling</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Technical Drawings</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Product / Enclosure Design</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Print-Ready File Prep</span><span class="service-rate" data-rate="40">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-cube"></i>
+              <h3>3D Printing</h3>
+              <p>FDM/resin 3D printing, prototyping, and small-batch production. <strong>CDMX only.</strong></p>
+              <span class="service-rate" data-rate="35">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>FDM Printing</span><span class="service-rate" data-rate="30">/hr</span></div>
+              <div class="sub-service"><span>Resin Printing</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Post-Processing &amp; Finishing</span><span class="service-rate" data-rate="30">/hr</span></div>
+              <div class="sub-service"><span>Prototyping Consultation</span><span class="service-rate" data-rate="35">/hr</span></div>
+            </div>
+          </div>
         </div>
         </div>
         <div class="rate-panel" id="panel-project">
@@ -709,6 +771,138 @@
                 <li>Build for 1 platform</li>
               </ul>
             </div>
+            <div class="project-rate-card">
+              <i class="fas fa-language"></i>
+              <h3>Custom Programming Language</h3>
+              <p>Full language with lexer, parser, interpreter or compiler, and documentation.</p>
+              <div class="project-price"><span class="service-rate" data-rate="5000" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Language specification</li>
+                <li>Lexer &amp; parser</li>
+                <li>Interpreter or compiler</li>
+                <li>Standard library basics</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-puzzle-piece"></i>
+              <h3>Browser Extension</h3>
+              <p>Chrome or Firefox extension with UI, background logic, and store listing.</p>
+              <div class="project-price"><span class="service-rate" data-rate="600" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Popup &amp; content scripts</li>
+                <li>Background service worker</li>
+                <li>Store-ready package</li>
+                <li>1 round of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-microchip"></i>
+              <h3>OS Kernel / Bootloader</h3>
+              <p>Minimal operating system kernel or bootloader with documentation.</p>
+              <div class="project-price"><span class="service-rate" data-rate="6000" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Boot sequence</li>
+                <li>Memory management</li>
+                <li>Process scheduling</li>
+                <li>Documentation</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-terminal"></i>
+              <h3>CLI Tool / Dev Utility</h3>
+              <p>Published command-line tool or developer package (npm, PyPI, crates.io).</p>
+              <div class="project-price"><span class="service-rate" data-rate="500" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Core functionality</li>
+                <li>Tests &amp; CI</li>
+                <li>Package registry publish</li>
+                <li>README &amp; docs</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-desktop"></i>
+              <h3>Desktop Application</h3>
+              <p>Cross-platform desktop app with Electron or Tauri, installer included.</p>
+              <div class="project-price"><span class="service-rate" data-rate="2000" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Cross-platform build</li>
+                <li>Native OS integration</li>
+                <li>Auto-updater</li>
+                <li>2 rounds of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-memory"></i>
+              <h3>Embedded / IoT System</h3>
+              <p>Firmware and IoT solution with sensor integration and communication.</p>
+              <div class="project-price"><span class="service-rate" data-rate="1500" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Firmware development</li>
+                <li>Sensor integration</li>
+                <li>Wireless communication</li>
+                <li>Documentation</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-cubes"></i>
+              <h3>Smart Contract / dApp</h3>
+              <p>Solidity smart contract with testing, frontend, and deployment.</p>
+              <div class="project-price"><span class="service-rate" data-rate="2500" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Contract development</li>
+                <li>Test suite</li>
+                <li>Frontend integration</li>
+                <li>Mainnet deployment</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-video"></i>
+              <h3>Manim / Explainer Video</h3>
+              <p>Animated math or CS explainer video using Manim with voiceover-ready output.</p>
+              <div class="project-price"><span class="service-rate" data-rate="600" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Manim animation</li>
+                <li>Script &amp; storyboard</li>
+                <li>Up to 5 minutes</li>
+                <li>1 round of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-bullhorn"></i>
+              <h3>Ad Campaign Package</h3>
+              <p>Full digital ad campaign with creative assets, targeting strategy, and analytics.</p>
+              <div class="project-price"><span class="service-rate" data-rate="800" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Campaign strategy</li>
+                <li>Creative assets</li>
+                <li>Platform setup</li>
+                <li>Performance report</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-drafting-compass"></i>
+              <h3>CAD Model / Technical Drawing</h3>
+              <p>Production-ready 3D model or technical drawing package.</p>
+              <div class="project-price"><span class="service-rate" data-rate="400" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>3D model (STEP / STL)</li>
+                <li>Technical drawings</li>
+                <li>Print-ready export</li>
+                <li>1 round of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-cube"></i>
+              <h3>3D Print Run <small>(CDMX)</small></h3>
+              <p>3D printed prototype or small batch with post-processing. Mexico City only.</p>
+              <div class="project-price"><span class="service-rate" data-rate="100" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>File prep &amp; slicing</li>
+                <li>FDM or resin print</li>
+                <li>Post-processing</li>
+                <li>Local pickup / delivery</li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="contract-cta">
@@ -718,6 +912,126 @@
         <p class="contract-note">All project rates are estimates &mdash; final pricing depends on scope and complexity. <a href="mailto:nagusamecs@gmail.com">Get in touch</a> for a custom quote.</p>
     </div>
   </section>
+
+  <!-- Repositories Section -->
+  <section id="repositories">
+    <div class="container">
+      <h2 class="section-title"><span><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></span></h2>
+      <div class="repo-controls">
+        <div class="repo-filters">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="source">Original</button>
+          <button class="filter-btn" data-filter="fork">Forked</button>
+        </div>
+        <div class="repo-view-toggle">
+          <button class="view-btn active" data-view="grid" title="Grid view"><i class="fas fa-th"></i></button>
+          <button class="view-btn" data-view="expanded" title="Expanded view"><i class="fas fa-bars"></i></button>
+        </div>
+      </div>
+      <div class="repo-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="repo-search" placeholder="Search projects...">
+      </div>
+      <div id="repo-grid" class="repo-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading repositories...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Repository Modal -->
+  <div id="repo-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close">&times;</button>
+      <div class="modal-header">
+        <img id="modal-icon" class="modal-icon" src="" alt="">
+        <div>
+          <h2 id="modal-title"></h2>
+          <span id="modal-language" class="modal-language"></span>
+        </div>
+      </div>
+
+      <!-- Tab Navigation -->
+      <div class="modal-tabs">
+        <button class="modal-tab active" data-tab="overview">Overview</button>
+        <button class="modal-tab" data-tab="readme">README</button>
+        <button class="modal-tab" data-tab="releases">Releases</button>
+        <button class="modal-tab" data-tab="license">License</button>
+        <div class="modal-tab-chevrons">
+          <button class="modal-chevron modal-chevron-left" aria-label="Previous tab"><i class="fas fa-chevron-left"></i></button>
+          <button class="modal-chevron modal-chevron-right" aria-label="Next tab"><i class="fas fa-chevron-right"></i></button>
+        </div>
+      </div>
+
+      <!-- Tab: Overview -->
+      <div id="modal-tab-overview" class="modal-tab-content active">
+        <img id="modal-social-preview" class="modal-social-preview" src="" alt="Social Preview">
+        <p id="modal-description" class="modal-description"></p>
+        <div id="modal-languages-detail" class="modal-languages-detail"></div>
+        <div id="modal-stats" class="modal-stats"></div>
+        <div id="modal-topics" class="modal-topics"></div>
+        <div class="modal-actions">
+          <a id="modal-link" href="" target="_blank" class="btn btn-primary"><i class="fab fa-github"></i> View on GitHub</a>
+          <a id="modal-homepage" href="" target="_blank" class="btn btn-secondary"><i class="fas fa-external-link-alt"></i> Live Demo</a>
+        </div>
+      </div>
+
+      <!-- Tab: README -->
+      <div id="modal-tab-readme" class="modal-tab-content">
+        <div id="modal-readme-body" class="modal-readme-body">
+          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>
+        </div>
+      </div>
+
+      <!-- Tab: Releases -->
+      <div id="modal-tab-releases" class="modal-tab-content">
+        <div id="modal-releases-body" class="modal-releases-body">
+          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading releases...</div>
+        </div>
+      </div>
+
+      <!-- Tab: License -->
+      <div id="modal-tab-license" class="modal-tab-content">
+        <div id="modal-license-body" class="modal-license-body">
+          <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading license...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Collaborations Section -->
+  <section id="collaborations">
+    <div class="container">
+      <h2 class="section-title"><span>Collaborations</span></h2>
+      <div id="collab-grid" class="collab-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Store Apps Section -->
+  <section id="store-apps">
+    <div class="container">
+      <h2 class="section-title"><span>Apps &amp; Extensions</span></h2>
+      <div id="store-grid" class="store-grid">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Activity Section -->
+  <section id="activity">
+    <div class="container">
+      <h2 class="section-title"><span>GitHub Activity</span></h2>
+      <div id="contribution-graph" class="contribution-graph">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity...</div>
+      </div>
+      <div id="recent-activity" class="recent-activity">
+        <h3>Recent Activity</h3>
+        <ul id="activity-feed" class="activity-feed"></ul>
+      </div>
+    </div>
+  </section>
+
 
   <!-- Footer -->
   <footer>

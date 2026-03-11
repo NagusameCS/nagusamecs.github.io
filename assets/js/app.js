@@ -980,7 +980,7 @@ async function init() {
   setupCurrencyConversion();
   setupServiceCardToggle();
   setupRateTabs();
-  setupRushToggle();
+
 
   // Load everything in parallel
   await Promise.allSettled([
@@ -1038,8 +1038,7 @@ function setupCurrencyConversion() {
   function updateRates(currency) {
     currentCurrency = currency;
     const info = RATES[currency];
-    const rushOn = document.getElementById('rush-toggle')?.checked || false;
-    const multiplier = rushOn ? 1.5 : 1;
+    const multiplier = 1;
     document.querySelectorAll('.service-rate').forEach(el => {
       const baseUSD = parseFloat(el.dataset.rate);
       const isFlat = el.dataset.flat === 'true';
@@ -1088,16 +1087,7 @@ function setupRateTabs() {
   });
 }
 
-// ===== RUSH RATE TOGGLE =====
-function setupRushToggle() {
-  const rushToggle = document.getElementById('rush-toggle');
-  if (!rushToggle) return;
-  rushToggle.addEventListener('change', () => {
-    // Re-run currency conversion with current currency to apply/remove multiplier
-    const activeBtn = document.querySelector('.currency-btn.active');
-    if (activeBtn) activeBtn.click();
-  });
-}
+
 
 // ===== ORBITING SOCIAL BUTTONS — 3D RING (EDGE-ON) =====
 (function () {
@@ -1378,7 +1368,7 @@ function setupRushToggle() {
     const sels = [
       '.agar-letter',
       '.skill-tag', '.about-detail-tag', '.highlight-item',
-      '.repo-card', '.store-card', '.award-card', '.collab-card',
+      '.repo-card', '.store-card', '.collab-card',
       '.contact-card', '.activity-item', '.timeline-item',
       '.filter-btn', '.view-btn', '.stat',
       '.section-title', '.nav-logo', '.nav-links a',

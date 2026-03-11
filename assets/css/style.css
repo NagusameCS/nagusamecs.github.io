@@ -348,37 +348,6 @@ section {
   line-height: 1.5;
 }
 
-/* ===== AWARDS ===== */
-#awards { background: var(--bg-secondary); }
-.awards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
-}
-.award-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 20px;
-}
-.award-card > i {
-  font-size: 1.1rem;
-  color: var(--text-muted);
-  margin-bottom: 10px;
-  display: block;
-}
-.award-card h3 {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-.award-card p {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
 /* ===== FEATURED CAROUSEL ===== */
 .featured-carousel {
   position: relative;
@@ -1807,73 +1776,6 @@ footer {
 }
 .rate-panel.active {
   display: block;
-}
-
-/* Rush toggle */
-.rush-toggle-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: 1.2rem;
-}
-.rush-label {
-  position: relative;
-  display: inline-block;
-  width: 38px;
-  height: 20px;
-  cursor: pointer;
-}
-.rush-label input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-.rush-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--border);
-  border-radius: 20px;
-  transition: background 0.3s;
-}
-.rush-slider::before {
-  content: '';
-  position: absolute;
-  left: 2px;
-  top: 2px;
-  width: 16px;
-  height: 16px;
-  background: var(--text-primary);
-  border-radius: 50%;
-  transition: transform 0.3s;
-}
-.rush-label input:checked + .rush-slider {
-  background: #f59e0b;
-}
-.rush-label input:checked + .rush-slider::before {
-  transform: translateX(18px);
-  background: #000;
-}
-.rush-text {
-  font-size: 0.82rem;
-  color: var(--text-secondary);
-}
-.rush-text i {
-  color: #f59e0b;
-}
-.rush-badge {
-  display: inline-block;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-left: 4px;
 }
 
 /* Project-based rate cards */
