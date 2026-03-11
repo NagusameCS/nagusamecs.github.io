@@ -20,34 +20,38 @@
   slash.style.width = '0px';
   slash.style.height = '0.5px';
 
-  // Phase 1: Razor-thin line slashes across (P5 speed)
+  // Phase 1: Razor-thin line slashes all the way across — stays thin
   requestAnimationFrame(() => {
-    slash.style.transition = 'width 0.18s cubic-bezier(0.22, 1, 0.36, 1), height 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
+    slash.style.transition = 'width 0.15s cubic-bezier(0.12, 0, 0.39, 0)';
     slash.style.width = diag + 'px';
-    slash.style.height = '2px';
   });
 
-  // Phase 2: Line expands into wedge covering viewport
-  setTimeout(() => {
-    slash.style.transition = 'height 0.2s cubic-bezier(0.22, 1, 0.36, 1)';
+  // Phase 2: Line reached the end — now expand to fill the screen
+  slash.addEventListener('transitionend', function onSlash(e) {
+    if (e.propertyName !== 'width') return;
+    slash.removeEventListener('transitionend', onSlash);
+
+    // Expand the slash into a full diagonal rectangle
+    slash.style.transition = 'height 0.22s cubic-bezier(0.33, 1, 0.68, 1)';
     slash.style.height = diag + 'px';
-  }, 200);
 
-  // Phase 3: Overlay snaps to black (fills any remaining gap)
-  setTimeout(() => {
-    overlay.classList.add('to-black');
-  }, 320);
+    // Once expansion finishes, snap overlay to black and fade out
+    slash.addEventListener('transitionend', function onExpand(e2) {
+      if (e2.propertyName !== 'height') return;
+      slash.removeEventListener('transitionend', onExpand);
 
-  // Phase 4: Fade out to reveal the site
-  setTimeout(() => {
-    overlay.classList.add('fade-out');
-    document.body.classList.remove('intro-active');
-  }, 450);
+      overlay.classList.add('to-black');
 
-  // Clean up
-  setTimeout(() => {
-    overlay.remove();
-  }, 780);
+      // Wait one frame for black to paint, then fade
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          overlay.classList.add('fade-out');
+          document.body.classList.remove('intro-active');
+          overlay.addEventListener('animationend', () => overlay.remove());
+        });
+      });
+    });
+  });
 })();
 
 const GH_USER = 'NagusameCS';
