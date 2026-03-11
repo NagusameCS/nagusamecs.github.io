@@ -203,6 +203,10 @@
     <div class="container">
       <h2 class="section-title section-toggle" data-target="contract-content"><span>Services &amp; Rates</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
       <div id="contract-content" class="section-collapsible collapsed">
+        <div class="contract-availability">
+          <span class="availability-dot"></span>
+          <span class="availability-text">Currently accepting new clients</span>
+        </div>
         <p class="contract-intro">Available for freelance and contract work. All rates are hourly unless otherwise noted. <span class="currency-note">Showing in <strong id="currency-label">USD</strong> &mdash; <button id="currency-toggle" class="currency-toggle-btn">Change currency</button></span></p>
         <div class="currency-selector" id="currency-selector" style="display:none;">
           <button class="currency-btn active" data-currency="USD">USD $</button>
@@ -213,6 +217,18 @@
           <button class="currency-btn" data-currency="CAD">CAD $</button>
           <button class="currency-btn" data-currency="AUD">AUD $</button>
         </div>
+        <div class="rate-type-tabs">
+          <button class="rate-tab active" data-tab="hourly">Hourly Rates</button>
+          <button class="rate-tab" data-tab="project">Project-Based</button>
+        </div>
+        <div class="rate-panel active" id="panel-hourly">
+          <div class="rush-toggle-bar">
+            <label class="rush-label">
+              <input type="checkbox" id="rush-toggle">
+              <span class="rush-slider"></span>
+            </label>
+            <span class="rush-text"><i class="fas fa-bolt"></i> Rush / Priority Rate <span class="rush-badge">1.5&times;</span></span>
+          </div>
         <div class="services-grid">
           <div class="service-card expandable">
             <div class="service-card-header">
@@ -316,7 +332,85 @@
             </div>
           </div>
         </div>
-        <p class="contract-note">Project-based pricing also available. <a href="mailto:nagusamecs@gmail.com">Get in touch</a> for a custom quote.</p>
+        </div>
+        <div class="rate-panel" id="panel-project">
+          <div class="project-rates-grid">
+            <div class="project-rate-card">
+              <i class="fas fa-globe"></i>
+              <h3>Landing Page / Static Site</h3>
+              <p>Single-page site, portfolio, or marketing page with responsive design.</p>
+              <div class="project-price"><span class="service-rate" data-rate="300" data-flat="true"></span><span class="project-label">flat rate</span></div>
+              <ul class="project-includes">
+                <li>Responsive design</li>
+                <li>Up to 3 pages</li>
+                <li>1 round of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-code"></i>
+              <h3>Full-Stack Web App</h3>
+              <p>Complete web application with frontend, backend, database, and deployment.</p>
+              <div class="project-price"><span class="service-rate" data-rate="2500" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Frontend &amp; backend</li>
+                <li>Database setup</li>
+                <li>Auth &amp; deployment</li>
+                <li>2 rounds of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-mobile-alt"></i>
+              <h3>Mobile App</h3>
+              <p>Native or cross-platform mobile application from concept to App Store.</p>
+              <div class="project-price"><span class="service-rate" data-rate="3500" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>iOS or cross-platform</li>
+                <li>API integration</li>
+                <li>App Store submission</li>
+                <li>2 rounds of revisions</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-shield-alt"></i>
+              <h3>Security Audit</h3>
+              <p>Comprehensive security review of an existing application or codebase.</p>
+              <div class="project-price"><span class="service-rate" data-rate="800" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Vulnerability report</li>
+                <li>Code review</li>
+                <li>Remediation guidance</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-server"></i>
+              <h3>API / Backend System</h3>
+              <p>RESTful or GraphQL API with database, auth, and documentation.</p>
+              <div class="project-price"><span class="service-rate" data-rate="1500" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>API design &amp; docs</li>
+                <li>Database architecture</li>
+                <li>Auth integration</li>
+                <li>Deployment config</li>
+              </ul>
+            </div>
+            <div class="project-rate-card">
+              <i class="fas fa-file-alt"></i>
+              <h3>LaTeX Document</h3>
+              <p>Professionally typeset thesis, report, or academic paper.</p>
+              <div class="project-price"><span class="service-rate" data-rate="150" data-flat="true"></span><span class="project-label">starting at</span></div>
+              <ul class="project-includes">
+                <li>Up to 50 pages</li>
+                <li>Bibliography formatting</li>
+                <li>1 round of revisions</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="contract-cta">
+          <p>Interested in working together?</p>
+          <a href="mailto:nagusamecs@gmail.com?subject=Contract%20Inquiry&body=Hi%2C%20I'm%20interested%20in%20your%20services.%0A%0AService%3A%20%0ABudget%3A%20%0ATimeline%3A%20%0ADetails%3A%20" class="cta-btn"><i class="fas fa-paper-plane"></i> Request a Quote</a>
+        </div>
+        <p class="contract-note">All project rates are estimates &mdash; final pricing depends on scope and complexity. <a href="mailto:nagusamecs@gmail.com">Get in touch</a> for a custom quote.</p>
       </div>
     </div>
   </section>

@@ -1001,6 +1001,8 @@ async function init() {
   setupCollapsibleSections();
   setupCurrencyConversion();
   setupServiceCardToggle();
+  setupRateTabs();
+  setupRushToggle();
   setupThemeToggle();
 
   // Load everything in parallel
@@ -1103,13 +1105,20 @@ function setupCurrencyConversion() {
     else if (tz.startsWith('Australia/')) currentCurrency = 'AUD';
   } catch (e) {}
 
+  function formatNumber(n) {
+    return n >= 1000 ? n.toLocaleString('en-US') : String(n);
+  }
+
   function updateRates(currency) {
     currentCurrency = currency;
     const info = RATES[currency];
+    const rushOn = document.getElementById('rush-toggle')?.checked || false;
+    const multiplier = rushOn ? 1.5 : 1;
     document.querySelectorAll('.service-rate').forEach(el => {
       const baseUSD = parseFloat(el.dataset.rate);
-      const converted = Math.round(baseUSD * info.rate);
-      el.dataset.display = `${info.symbol}${converted}`;
+      const isFlat = el.dataset.flat === 'true';
+      const converted = Math.round(baseUSD * info.rate * (isFlat ? 1 : multiplier));
+      el.dataset.display = `${info.symbol}${formatNumber(converted)}`;
     });
     const label = document.getElementById('currency-label');
     if (label) label.textContent = currency;
@@ -1136,6 +1145,32 @@ function setupCurrencyConversion() {
 
   // Initialize
   updateRates(currentCurrency);
+}
+
+// ===== RATE TYPE TABS =====
+function setupRateTabs() {
+  const tabs = document.querySelectorAll('.rate-tab');
+  const panels = document.querySelectorAll('.rate-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const target = document.getElementById(`panel-${tab.dataset.tab}`);
+      if (target) target.classList.add('active');
+    });
+  });
+}
+
+// ===== RUSH RATE TOGGLE =====
+function setupRushToggle() {
+  const rushToggle = document.getElementById('rush-toggle');
+  if (!rushToggle) return;
+  rushToggle.addEventListener('change', () => {
+    // Re-run currency conversion with current currency to apply/remove multiplier
+    const activeBtn = document.querySelector('.currency-btn.active');
+    if (activeBtn) activeBtn.click();
+  });
 }
 
 // ===== LIGHT MODE TOGGLE =====

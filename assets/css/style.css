@@ -1690,7 +1690,7 @@ footer {
   .skills-experience-row { flex-direction: column; gap: 1.5rem; }
   .skills-experience-row > .timeline { min-width: 0; }
 
-  .repo-grid, .collab-grid, .store-grid, .services-grid {
+  .repo-grid, .collab-grid, .store-grid, .services-grid, .project-rates-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1886,6 +1886,244 @@ footer {
 .contract-note a:hover {
   border-color: var(--text-primary);
   opacity: 1;
+}
+
+/* Availability banner */
+.contract-availability {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.availability-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+  animation: pulse-dot 2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(34, 197, 94, 0.5); }
+  50% { opacity: 0.6; box-shadow: 0 0 12px rgba(34, 197, 94, 0.8); }
+}
+
+/* Rate type tabs */
+.rate-type-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  width: fit-content;
+}
+.rate-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.rate-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+.rate-tab.active {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-weight: 600;
+}
+.rate-panel {
+  display: none;
+}
+.rate-panel.active {
+  display: block;
+}
+
+/* Rush toggle */
+.rush-toggle-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.2rem;
+}
+.rush-label {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+  cursor: pointer;
+}
+.rush-label input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.rush-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+.rush-slider::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+.rush-label input:checked + .rush-slider {
+  background: #f59e0b;
+}
+.rush-label input:checked + .rush-slider::before {
+  transform: translateX(18px);
+  background: #000;
+}
+.rush-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+.rush-text i {
+  color: #f59e0b;
+}
+.rush-badge {
+  display: inline-block;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+/* Project-based rate cards */
+.project-rates-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+.project-rate-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: border-color var(--transition);
+}
+.project-rate-card:hover {
+  border-color: #444;
+}
+.project-rate-card > i {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: block;
+}
+.project-rate-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.project-rate-card p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.project-price {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.project-price .service-rate {
+  font-size: 1.3rem;
+}
+.project-label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.project-includes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+.project-includes li {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  padding: 4px 0;
+  padding-left: 16px;
+  position: relative;
+}
+.project-includes li::before {
+  content: '\f00c';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 0.6rem;
+  position: absolute;
+  left: 0;
+  top: 6px;
+  color: #22c55e;
+}
+
+/* CTA */
+.contract-cta {
+  text-align: center;
+  padding: 28px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1.2rem;
+}
+.contract-cta p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+}
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 12px 28px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity var(--transition);
+}
+.cta-btn:hover {
+  opacity: 0.85;
 }
 
 /* ===== LIGHT MODE ===== */
