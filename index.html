@@ -19,13 +19,17 @@
         <i class="fas fa-bars"></i>
       </button>
       <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#repositories">Highlighted Projects</a></li>
+        <li><a href="#experience">Skills &amp; Experience</a></li>
+        <li><a href="#contract">Services</a></li>
+        <li><a href="#repositories">Projects</a></li>
         <li><a href="#collaborations">Collaborations</a></li>
         <li><a href="#store-apps">Apps &amp; Extensions</a></li>
+        <li><a href="#awards">Awards</a></li>
         <li><a href="#activity">Activity</a></li>
       </ul>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle light mode">
+        <i class="fas fa-sun"></i>
+      </button>
     </div>
   </nav>
 
@@ -69,34 +73,11 @@
     </div>
   </section>
 
-  <!-- About Section -->
-  <section id="about">
-    <div class="container">
-      <h2 class="section-title">About Me</h2>
-      <div class="about-grid">
-        <div class="about-text">
-          <p>I am a high school student at ASF in Mexico City, currently enrolled in the full IB program with additional AP courses. With 10 years of experience in both computer science and fencing, I&rsquo;m passionate about technology, leadership, and making educational resources more accessible to students worldwide.</p>
-          <p>I lead the CS wing at a volunteer school, teaching over 40 students weekly, and head RSC (Robotics and Science Club). I&rsquo;m currently leading the world&rsquo;s first legal student initiative to bring IB resources to students for free.</p>
-          <div class="about-highlights">
-            <div class="highlight-item"><i class="fas fa-graduation-cap"></i><span>Full IB Diploma Candidate (4HL / 3SL) &mdash; Expected 2026</span></div>
-            <div class="highlight-item"><i class="fas fa-book"></i><span>AP Coursework: AP-CSA, AP-BIO, AP-CSP</span></div>
-            <div class="highlight-item"><i class="fas fa-laptop-code"></i><span>11 years in Computer Science</span></div>
-            <div class="highlight-item"><i class="fas fa-medal"></i><span>10 years competitive fencing</span></div>
-          </div>
-          <div id="about-details" class="about-details"></div>
-        </div>
-        <div class="about-skills">
-          <h3>Top Languages</h3>
-          <div id="languages-chart" class="languages-chart"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- Skills & Experience Section -->
   <section id="experience">
     <div class="container">
-      <h2 class="section-title">Skills, Languages &amp; Experience</h2>
+      <h2 class="section-title section-toggle" data-target="experience-content"><span>Skills, Languages &amp; Experience</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="experience-content" class="section-collapsible collapsed">
       <div class="skills-experience-row">
       <div class="skills-grid">
         <div class="skill-category">
@@ -200,28 +181,151 @@
             <p>10 years, training under Olympic-level coach</p>
           </div>
         </div>
+        <div class="timeline-item">
+          <div class="timeline-icon"><i class="fas fa-globe"></i></div>
+          <div class="timeline-content">
+            <h3>Founded OpenCS.dev</h3>
+            <p>Free educational platform for AP &amp; IB computer science students</p>
+          </div>
+        </div>
+      </div>
+      <div class="top-languages-panel">
+        <h3><i class="fas fa-chart-bar"></i> Top Languages</h3>
+        <div id="languages-chart" class="languages-chart"></div>
       </div>
       </div><!-- end skills-experience-row -->
+      </div><!-- end section-collapsible -->
+    </div>
+  </section>
+
+  <!-- Contract Section -->
+  <section id="contract">
+    <div class="container">
+      <h2 class="section-title section-toggle" data-target="contract-content"><span>Services &amp; Rates</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="contract-content" class="section-collapsible collapsed">
+        <p class="contract-intro">Available for freelance and contract work. All rates are hourly unless otherwise noted. <span class="currency-note">Showing in <strong id="currency-label">USD</strong> &mdash; <button id="currency-toggle" class="currency-toggle-btn">Change currency</button></span></p>
+        <div class="currency-selector" id="currency-selector" style="display:none;">
+          <button class="currency-btn active" data-currency="USD">USD $</button>
+          <button class="currency-btn" data-currency="EUR">EUR &euro;</button>
+          <button class="currency-btn" data-currency="GBP">GBP &pound;</button>
+          <button class="currency-btn" data-currency="MXN">MXN $</button>
+          <button class="currency-btn" data-currency="JPY">JPY &yen;</button>
+          <button class="currency-btn" data-currency="CAD">CAD $</button>
+          <button class="currency-btn" data-currency="AUD">AUD $</button>
+        </div>
+        <div class="services-grid">
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-comments"></i>
+              <h3>Consulting</h3>
+              <p>Technical consulting, code review, architecture guidance, and project planning.</p>
+              <span class="service-rate" data-rate="50">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Code Review</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Architecture Review</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Technical Advisory</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Project Planning</span><span class="service-rate" data-rate="50">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-mobile-alt"></i>
+              <h3>App Development</h3>
+              <p>Native iOS &amp; cross-platform mobile applications using Swift and React Native.</p>
+              <span class="service-rate" data-rate="60">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Full Project Development</span><span class="service-rate" data-rate="75">/hr</span></div>
+              <div class="sub-service"><span>Full-Stack App</span><span class="service-rate" data-rate="60">/hr</span></div>
+              <div class="sub-service"><span>Frontend Only</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Backend Only</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>UI/UX Implementation</span><span class="service-rate" data-rate="40">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-globe"></i>
+              <h3>Web Development</h3>
+              <p>Responsive websites, SPAs, and full-stack web applications.</p>
+              <span class="service-rate" data-rate="45">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Full Project Development</span><span class="service-rate" data-rate="65">/hr</span></div>
+              <div class="sub-service"><span>Full-Stack</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Frontend</span><span class="service-rate" data-rate="40">/hr</span></div>
+              <div class="sub-service"><span>Landing Page / Static Site</span><span class="service-rate" data-rate="30">/hr</span></div>
+              <div class="sub-service"><span>CMS Integration</span><span class="service-rate" data-rate="35">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-file-alt"></i>
+              <h3>LaTeX Formatting</h3>
+              <p>Professional document typesetting &mdash; research papers, theses, reports, and academic documents.</p>
+              <span class="service-rate" data-rate="30">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Template Creation</span><span class="service-rate" data-rate="35">/hr</span></div>
+              <div class="sub-service"><span>Math / Technical Typesetting</span><span class="service-rate" data-rate="35">/hr</span></div>
+              <div class="sub-service"><span>Document Conversion</span><span class="service-rate" data-rate="25">/hr</span></div>
+              <div class="sub-service"><span>Full Thesis / Report Formatting</span><span class="service-rate" data-rate="30">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-server"></i>
+              <h3>Backend Development</h3>
+              <p>API design, database architecture, server-side logic in Node.js, Python, Java, and more.</p>
+              <span class="service-rate" data-rate="55">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Full Project Development</span><span class="service-rate" data-rate="70">/hr</span></div>
+              <div class="sub-service"><span>API Development</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Database Design</span><span class="service-rate" data-rate="50">/hr</span></div>
+              <div class="sub-service"><span>Full-Stack</span><span class="service-rate" data-rate="65">/hr</span></div>
+              <div class="sub-service"><span>DevOps &amp; Deployment</span><span class="service-rate" data-rate="45">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-tools"></i>
+              <h3>Repair</h3>
+              <p>Hardware diagnostics, laptop &amp; printer repair, component-level troubleshooting.</p>
+              <span class="service-rate" data-rate="35">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Diagnostics Only</span><span class="service-rate" data-rate="25">/hr</span></div>
+              <div class="sub-service"><span>Hardware Repair</span><span class="service-rate" data-rate="35">/hr</span></div>
+              <div class="sub-service"><span>Software Troubleshooting</span><span class="service-rate" data-rate="30">/hr</span></div>
+              <div class="sub-service"><span>Data Recovery</span><span class="service-rate" data-rate="45">/hr</span></div>
+            </div>
+          </div>
+          <div class="service-card expandable">
+            <div class="service-card-header">
+              <i class="fas fa-shield-alt"></i>
+              <h3>Security Testing</h3>
+              <p>Vulnerability assessment, penetration testing, and security auditing for web and mobile apps.</p>
+              <span class="service-rate" data-rate="65">/hr <i class="fas fa-chevron-down sub-toggle-icon"></i></span>
+            </div>
+            <div class="sub-services">
+              <div class="sub-service"><span>Full Penetration Test</span><span class="service-rate" data-rate="75">/hr</span></div>
+              <div class="sub-service"><span>Code Security Audit</span><span class="service-rate" data-rate="55">/hr</span></div>
+              <div class="sub-service"><span>Vulnerability Scan</span><span class="service-rate" data-rate="45">/hr</span></div>
+              <div class="sub-service"><span>Security Consultation</span><span class="service-rate" data-rate="50">/hr</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="contract-note">Project-based pricing also available. <a href="mailto:nagusamecs@gmail.com">Get in touch</a> for a custom quote.</p>
+      </div>
     </div>
   </section>
 
   <!-- Repositories Section -->
   <section id="repositories">
     <div class="container">
-      <h2 class="section-title"><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Highlighted Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></h2>
-
-      <!-- Featured Carousel -->
-      <div class="featured-carousel">
-        <button class="carousel-arrow carousel-arrow-left" aria-label="Previous"><i class="fas fa-chevron-left"></i></button>
-        <div class="carousel-track-wrapper">
-          <div id="carousel-track" class="carousel-track">
-            <!-- Populated by JS -->
-          </div>
-        </div>
-        <button class="carousel-arrow carousel-arrow-right" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
-        <div class="carousel-dots" id="carousel-dots"></div>
-      </div>
-
+      <h2 class="section-title section-toggle" data-target="repositories-content"><span><a href="https://github.com/NagusameCS?tab=repositories" target="_blank" class="section-title-link">Projects <span class="section-title-hint">See all projects on GitHub &rarr;</span></a></span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="repositories-content" class="section-collapsible collapsed">
       <div class="repo-controls">
         <div class="repo-filters">
           <button class="filter-btn active" data-filter="all">All</button>
@@ -240,6 +344,7 @@
       <div id="repo-grid" class="repo-grid">
         <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading repositories...</div>
       </div>
+      </div><!-- end section-collapsible -->
     </div>
   </section>
 
@@ -306,27 +411,32 @@
   <!-- Collaborations Section -->
   <section id="collaborations">
     <div class="container">
-      <h2 class="section-title">Collaborations</h2>
+      <h2 class="section-title section-toggle" data-target="collaborations-content"><span>Collaborations</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="collaborations-content" class="section-collapsible collapsed">
       <div id="collab-grid" class="collab-grid">
         <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
       </div>
+      </div><!-- end section-collapsible -->
     </div>
   </section>
 
   <!-- Store Apps Section -->
   <section id="store-apps">
     <div class="container">
-      <h2 class="section-title">Apps &amp; Extensions</h2>
+      <h2 class="section-title section-toggle" data-target="store-content"><span>Apps &amp; Extensions</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="store-content" class="section-collapsible collapsed">
       <div id="store-grid" class="store-grid">
         <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
       </div>
+      </div><!-- end section-collapsible -->
     </div>
   </section>
 
   <!-- Awards Section -->
   <section id="awards">
     <div class="container">
-      <h2 class="section-title">Awards &amp; Publications</h2>
+      <h2 class="section-title section-toggle" data-target="awards-content"><span>Awards &amp; Publications</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="awards-content" class="section-collapsible collapsed">
       <div class="awards-grid">
         <div class="award-card">
           <i class="fas fa-trophy"></i>
@@ -360,13 +470,15 @@
           <p>Sole recipient for exceptional role portrayal in ICC simulations</p>
         </div>
       </div>
+      </div><!-- end section-collapsible -->
     </div>
   </section>
 
   <!-- Activity Section -->
   <section id="activity">
     <div class="container">
-      <h2 class="section-title">GitHub Activity</h2>
+      <h2 class="section-title section-toggle" data-target="activity-content"><span>GitHub Activity</span> <i class="fas fa-chevron-down toggle-icon"></i></h2>
+      <div id="activity-content" class="section-collapsible collapsed">
       <div id="contribution-graph" class="contribution-graph">
         <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activity...</div>
       </div>
@@ -374,8 +486,12 @@
         <h3>Recent Activity</h3>
         <ul id="activity-feed" class="activity-feed"></ul>
       </div>
+      </div><!-- end section-collapsible -->
     </div>
   </section>
+
+  <!-- Theme transition overlay -->
+  <div id="theme-transition-overlay" class="theme-transition-overlay"></div>
 
   <!-- Footer -->
   <footer>

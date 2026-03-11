@@ -105,18 +105,6 @@ async function loadProfile() {
   document.getElementById('stat-followers').textContent = profile.followers;
   document.getElementById('stat-following').textContent = profile.following;
 
-  // About details
-  const details = [];
-  if (profile.company) details.push({ icon: 'fas fa-building', text: profile.company });
-  if (profile.location) details.push({ icon: 'fas fa-map-marker-alt', text: profile.location });
-  if (profile.blog) details.push({ icon: 'fas fa-globe', text: profile.blog.replace(/^https?:\/\//, '') });
-  details.push({ icon: 'fas fa-calendar', text: `Joined ${new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` });
-  if (profile.hireable) details.push({ icon: 'fas fa-briefcase', text: 'Open to opportunities' });
-
-  document.getElementById('about-details').innerHTML = details.map(d =>
-    `<span class="about-detail-tag"><i class="${d.icon}"></i>${escapeHtml(d.text)}</span>`
-  ).join('');
-
   return profile;
 }
 
@@ -143,7 +131,6 @@ async function loadRepos() {
   allRepos = repos.filter(r => !ignoredSet.has(r.name.toLowerCase()));
 
   renderRepos(allRepos);
-  renderFeaturedCarousel(allRepos);
   computeLanguages(allRepos);
 }
 
@@ -202,93 +189,7 @@ function renderRepos(repos) {
   });
 }
 
-// ===== FEATURED CAROUSEL =====
-const FEATURED_REPOS = ['TensorOS', 'Pseudocode', 'IVY', 'HEATMAP'];
-
-function renderFeaturedCarousel(repos) {
-  const track = document.getElementById('carousel-track');
-  const dotsContainer = document.getElementById('carousel-dots');
-  if (!track || !dotsContainer) return;
-
-  const featured = FEATURED_REPOS
-    .map(name => repos.find(r => r.name === name))
-    .filter(Boolean);
-
-  if (featured.length === 0) {
-    document.querySelector('.featured-carousel').style.display = 'none';
-    return;
-  }
-
-  track.innerHTML = featured.map((repo, i) => {
-    const overrideIcon = ICON_OVERRIDES[repo.name];
-    const langColor = LANG_COLORS[repo.language] || '#8b949e';
-    const heatmapClass = repo.name === 'HEATMAP' ? ' heatmap-icon-bg' : '';
-    const letter = (repo.name.charAt(0) || '?').toUpperCase();
-    const iconHtml = overrideIcon
-      ? `<img class="carousel-card-icon${heatmapClass}" src="${overrideIcon}" alt="">`
-      : `<div class="repo-card-icon-placeholder" style="width:64px;height:64px;font-size:1.4rem;">${letter}</div>`;
-
-    return `
-      <div class="carousel-slide" data-index="${i}">
-        <div class="carousel-card" data-repo="${repo.name}">
-          ${iconHtml}
-          <div class="carousel-card-body">
-            <h3>${escapeHtml(repo.name)}</h3>
-            <p>${escapeHtml(repo.description) || 'No description provided.'}</p>
-            <div class="carousel-card-meta">
-              ${repo.language ? `<span><span class="lang-dot" style="background:${langColor}"></span>${repo.language}</span>` : ''}
-              <span><i class="fas fa-star"></i> ${repo.stargazers_count}</span>
-              <span><i class="fas fa-code-branch"></i> ${repo.forks_count}</span>
-            </div>
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-
-  // Dots
-  dotsContainer.innerHTML = featured.map((_, i) =>
-    `<button class="carousel-dot${i === 0 ? ' active' : ''}" data-slide="${i}" aria-label="Slide ${i + 1}"></button>`
-  ).join('');
-
-  let current = 0;
-  const total = featured.length;
-
-  function goTo(idx) {
-    current = ((idx % total) + total) % total;
-    track.style.transform = `translateX(-${current * 100}%)`;
-    dotsContainer.querySelectorAll('.carousel-dot').forEach((d, i) => d.classList.toggle('active', i === current));
-  }
-
-  document.querySelector('.carousel-arrow-left').addEventListener('click', () => goTo(current - 1));
-  document.querySelector('.carousel-arrow-right').addEventListener('click', () => goTo(current + 1));
-  dotsContainer.querySelectorAll('.carousel-dot').forEach(dot => {
-    dot.addEventListener('click', () => goTo(parseInt(dot.dataset.slide)));
-  });
-
-  // Click card => open modal
-  track.querySelectorAll('.carousel-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const repo = allRepos.find(r => r.name === card.dataset.repo);
-      if (repo) openRepoModal(repo);
-    });
-  });
-
-  // Auto-advance every 5 seconds
-  let autoTimer = setInterval(() => goTo(current + 1), 5000);
-  const carousel = document.querySelector('.featured-carousel');
-  carousel.addEventListener('mouseenter', () => clearInterval(autoTimer));
-  carousel.addEventListener('mouseleave', () => {
-    autoTimer = setInterval(() => goTo(current + 1), 5000);
-  });
-
-  // Swipe support
-  let touchStartX = 0;
-  track.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  track.addEventListener('touchend', (e) => {
-    const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
-  });
-}
+// ===== FEATURED CAROUSEL — REMOVED =====
 
 function computeLanguages(repos) {
   const langCount = {};
@@ -1097,6 +998,10 @@ async function init() {
   setupNav();
   setupModal();
   setupFilters();
+  setupCollapsibleSections();
+  setupCurrencyConversion();
+  setupServiceCardToggle();
+  setupThemeToggle();
 
   // Load everything in parallel
   await Promise.allSettled([
@@ -1111,6 +1016,198 @@ async function init() {
 }
 
 init();
+
+// ===== COLLAPSIBLE SECTIONS =====
+function setupCollapsibleSections() {
+  document.querySelectorAll('.section-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+      // Don't toggle if clicking a link inside the title
+      if (e.target.closest('a')) return;
+      const targetId = toggle.dataset.target;
+      const content = document.getElementById(targetId);
+      if (!content) return;
+      const isCollapsed = content.classList.contains('collapsed');
+      if (isCollapsed) {
+        content.classList.remove('collapsed');
+        toggle.classList.add('expanded');
+        // Set max-height to scrollHeight for smooth animation
+        content.style.maxHeight = content.scrollHeight + 'px';
+        setTimeout(() => { content.style.maxHeight = ''; }, 600);
+      } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        requestAnimationFrame(() => {
+          content.classList.add('collapsed');
+          toggle.classList.remove('expanded');
+          content.style.maxHeight = '';
+        });
+      }
+    });
+  });
+
+  // Auto-expand section when navigating via hash or nav links
+  function expandFromHash() {
+    const hash = window.location.hash;
+    if (!hash) return;
+    const section = document.querySelector(hash);
+    if (!section) return;
+    const toggle = section.querySelector('.section-toggle');
+    const targetId = toggle?.dataset.target;
+    const content = targetId ? document.getElementById(targetId) : null;
+    if (content && content.classList.contains('collapsed')) {
+      content.classList.remove('collapsed');
+      if (toggle) toggle.classList.add('expanded');
+    }
+  }
+  window.addEventListener('hashchange', expandFromHash);
+  // Also handle nav link clicks
+  document.querySelectorAll('.nav-links a[href^="#"]').forEach(link => {
+    link.addEventListener('click', () => {
+      setTimeout(expandFromHash, 50);
+    });
+  });
+  expandFromHash();
+}
+
+// ===== CURRENCY CONVERSION =====
+// ===== SERVICE CARD SUB-SERVICE TOGGLE =====
+function setupServiceCardToggle() {
+  document.querySelectorAll('.service-card.expandable').forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.sub-service')) return;
+      card.classList.toggle('expanded');
+    });
+  });
+}
+
+function setupCurrencyConversion() {
+  const RATES = {
+    USD: { rate: 1, symbol: '$', decimals: 0 },
+    EUR: { rate: 0.92, symbol: '\u20ac', decimals: 0 },
+    GBP: { rate: 0.79, symbol: '\u00a3', decimals: 0 },
+    MXN: { rate: 17.15, symbol: '$', decimals: 0 },
+    JPY: { rate: 149.5, symbol: '\u00a5', decimals: 0 },
+    CAD: { rate: 1.36, symbol: '$', decimals: 0 },
+    AUD: { rate: 1.53, symbol: '$', decimals: 0 },
+  };
+
+  let currentCurrency = 'USD';
+
+  // Try to auto-detect region
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if (tz.startsWith('Europe/London') || tz.startsWith('Europe/Belfast')) currentCurrency = 'GBP';
+    else if (tz.startsWith('Europe/')) currentCurrency = 'EUR';
+    else if (tz.startsWith('America/Mexico') || tz === 'America/Cancun' || tz === 'America/Merida' || tz === 'America/Monterrey' || tz === 'America/Matamoros' || tz === 'America/Mazatlan' || tz === 'America/Chihuahua' || tz === 'America/Hermosillo' || tz === 'America/Tijuana' || tz === 'America/Bahia_Banderas' || tz === 'America/Ojinaga') currentCurrency = 'MXN';
+    else if (tz.startsWith('Asia/Tokyo')) currentCurrency = 'JPY';
+    else if (tz.startsWith('America/Toronto') || tz.startsWith('America/Vancouver') || tz.startsWith('America/Edmonton') || tz.startsWith('America/Winnipeg') || tz.startsWith('America/Halifax') || tz.startsWith('America/St_Johns')) currentCurrency = 'CAD';
+    else if (tz.startsWith('Australia/')) currentCurrency = 'AUD';
+  } catch (e) {}
+
+  function updateRates(currency) {
+    currentCurrency = currency;
+    const info = RATES[currency];
+    document.querySelectorAll('.service-rate').forEach(el => {
+      const baseUSD = parseFloat(el.dataset.rate);
+      const converted = Math.round(baseUSD * info.rate);
+      el.dataset.display = `${info.symbol}${converted}`;
+    });
+    const label = document.getElementById('currency-label');
+    if (label) label.textContent = currency;
+    document.querySelectorAll('.currency-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.currency === currency);
+    });
+  }
+
+  // Toggle currency selector visibility
+  const toggleBtn = document.getElementById('currency-toggle');
+  const selector = document.getElementById('currency-selector');
+  if (toggleBtn && selector) {
+    toggleBtn.addEventListener('click', () => {
+      selector.style.display = selector.style.display === 'none' ? '' : 'none';
+    });
+  }
+
+  // Currency button clicks
+  document.querySelectorAll('.currency-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      updateRates(btn.dataset.currency);
+    });
+  });
+
+  // Initialize
+  updateRates(currentCurrency);
+}
+
+// ===== LIGHT MODE TOGGLE =====
+function setupThemeToggle() {
+  const toggle = document.getElementById('theme-toggle');
+  const overlay = document.getElementById('theme-transition-overlay');
+  if (!toggle || !overlay) return;
+
+  // Check saved preference
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-mode');
+    toggle.innerHTML = '<i class="fas fa-moon"></i>';
+  }
+
+  toggle.addEventListener('click', (e) => {
+    const isLight = document.body.classList.contains('light-mode');
+    const newBg = isLight ? '#000000' : '#ffffff';
+
+    // Get click position for the spread origin
+    const rect = toggle.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+
+    // Calculate the maximum distance from click to any corner
+    const maxDist = Math.max(
+      Math.hypot(x, y),
+      Math.hypot(window.innerWidth - x, y),
+      Math.hypot(x, window.innerHeight - y),
+      Math.hypot(window.innerWidth - x, window.innerHeight - y)
+    );
+
+    // Set up overlay
+    overlay.style.background = newBg;
+    overlay.style.left = x + 'px';
+    overlay.style.top = y + 'px';
+    overlay.style.width = '0';
+    overlay.style.height = '0';
+    overlay.style.transform = 'translate(-50%, -50%) scale(1)';
+    overlay.style.borderRadius = '50%';
+
+    // Force reflow
+    overlay.offsetHeight;
+
+    // Expand
+    const diameter = maxDist * 2.2;
+    overlay.style.width = diameter + 'px';
+    overlay.style.height = diameter + 'px';
+    overlay.classList.add('expanding');
+    overlay.style.transform = 'translate(-50%, -50%) scale(1)';
+
+    // Midway through animation, toggle the theme
+    setTimeout(() => {
+      if (isLight) {
+        document.body.classList.remove('light-mode');
+        toggle.innerHTML = '<i class="fas fa-sun"></i>';
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.add('light-mode');
+        toggle.innerHTML = '<i class="fas fa-moon"></i>';
+        localStorage.setItem('theme', 'light');
+      }
+    }, 350);
+
+    // Clean up overlay
+    setTimeout(() => {
+      overlay.classList.remove('expanding');
+      overlay.style.width = '0';
+      overlay.style.height = '0';
+    }, 800);
+  });
+}
 
 // ===== ORBITING SOCIAL BUTTONS — 3D RING (EDGE-ON) =====
 (function () {
