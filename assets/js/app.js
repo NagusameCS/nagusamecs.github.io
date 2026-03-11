@@ -82,6 +82,16 @@ async function loadProfile() {
   const bioText = profile.bio || 'Great things are not done quickly';
   document.getElementById('bio').textContent = bioText;
 
+  // Populate mobile business card
+  const cardBio = document.getElementById('card-bio');
+  if (cardBio) cardBio.textContent = bioText;
+  const cardCompany = document.getElementById('card-company-link');
+  if (cardCompany && profile.company) cardCompany.textContent = profile.company;
+  else if (document.getElementById('card-company')) document.getElementById('card-company').style.display = 'none';
+  const cardLoc = document.querySelector('#card-location span');
+  if (cardLoc && profile.location) cardLoc.textContent = profile.location;
+  else if (document.getElementById('card-location')) document.getElementById('card-location').style.display = 'none';
+
   // Meta
   if (profile.company) {
     document.getElementById('company-link').textContent = profile.company;

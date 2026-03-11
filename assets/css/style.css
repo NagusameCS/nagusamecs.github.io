@@ -1587,42 +1587,124 @@ footer {
   transform: translateY(0);
 }
 
-/* ===== RESPONSIVE ===== */
+/* ===== MOBILE BUSINESS CARD ===== */
+#mobile-card {
+  display: none;
+}
+
 @media (max-width: 768px) {
-  .nav-links {
-    display: none;
-    position: absolute;
-    top: 56px;
-    left: 0;
-    right: 0;
+  #mobile-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px;
     background: var(--bg-primary);
-    border-bottom: 1px solid var(--border);
+  }
+  .card-inner {
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
+    padding: 40px 28px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    animation: cardFadeIn 0.5s ease;
+  }
+  @keyframes cardFadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .card-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+    letter-spacing: 0.5px;
+  }
+  .card-title {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+    line-height: 1.4;
+  }
+  .card-meta {
+    display: flex;
     flex-direction: column;
-    padding: 12px;
+    gap: 6px;
+    margin-bottom: 20px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
   }
-  .nav-links.open { display: flex; }
-  .nav-toggle { display: block; }
-  .nav-sep { display: none; }
-  .nav-tab.active::after { bottom: -2px; left: 0; right: 0; }
-
-  #hero h1 { font-size: 1.75rem; }
-  .hero-avatar { width: 90px; height: 90px; }
-  .avatar-orbit-wrapper { width: 160px; height: 160px; margin-bottom: 0.3rem; }
-  .hero-stats { gap: 24px; }
-  .skills-experience-row { flex-direction: column; gap: 1.5rem; }
-  .skills-experience-row > .timeline { min-width: 0; }
-
-  .repo-grid, .collab-grid, .store-grid, .services-grid, .project-rates-grid {
-    grid-template-columns: 1fr;
+  .card-meta a {
+    color: var(--text-secondary);
+  }
+  .card-meta i {
+    width: 16px;
+    text-align: center;
+    margin-right: 6px;
+    opacity: 0.6;
+  }
+  .card-socials {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .card-socials a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    transition: all 0.2s ease;
+  }
+  .card-socials a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+  }
+  .card-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 16px;
+  }
+  .card-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: 0;
+    letter-spacing: 0.3px;
+    opacity: 0.7;
+  }
+  .card-hint i {
+    margin-right: 6px;
+    opacity: 0.5;
   }
 
-  .modal-content { padding: 18px; }
-  .modal-header h2 { font-size: 1.1rem; }
+  /* Hide full site on mobile */
+  #navbar,
+  #hero,
+  .tab-group,
+  footer {
+    display: none !important;
+  }
 }
 
-@media (max-width: 480px) {
-  .hero-meta { flex-direction: column; gap: 8px; }
-}
+/* ===== RESPONSIVE ===== */
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
