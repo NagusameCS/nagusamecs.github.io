@@ -18,31 +18,36 @@
   // Position the slash at top-right, rotated toward bottom-left
   slash.style.transform = `rotate(-${angle}deg)`;
   slash.style.width = '0px';
-  slash.style.height = '1px';
+  slash.style.height = '0.5px';
 
-  // Phase 1: Line shoots across, starting thin and getting thicker
+  // Phase 1: Razor-thin line slashes across (P5 speed)
   requestAnimationFrame(() => {
-    slash.style.transition = 'width 0.45s cubic-bezier(0.16, 1, 0.3, 1), height 0.45s cubic-bezier(0.16, 1, 0.3, 1)';
+    slash.style.transition = 'width 0.18s cubic-bezier(0.22, 1, 0.36, 1), height 0.18s cubic-bezier(0.22, 1, 0.36, 1)';
     slash.style.width = diag + 'px';
-    slash.style.height = '4px';
+    slash.style.height = '2px';
   });
 
-  // Phase 2: Overlay flips to black as the line finishes
+  // Phase 2: Line expands into wedge covering viewport
+  setTimeout(() => {
+    slash.style.transition = 'height 0.2s cubic-bezier(0.22, 1, 0.36, 1)';
+    slash.style.height = diag + 'px';
+  }, 200);
+
+  // Phase 3: Overlay snaps to black (fills any remaining gap)
   setTimeout(() => {
     overlay.classList.add('to-black');
-  }, 380);
+  }, 320);
 
-  // Phase 3: Fade out the black overlay to reveal the site
+  // Phase 4: Fade out to reveal the site
   setTimeout(() => {
-    slash.style.display = 'none';
     overlay.classList.add('fade-out');
     document.body.classList.remove('intro-active');
-  }, 560);
+  }, 450);
 
   // Clean up
   setTimeout(() => {
     overlay.remove();
-  }, 890);
+  }, 780);
 })();
 
 const GH_USER = 'NagusameCS';
