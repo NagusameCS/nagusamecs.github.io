@@ -131,7 +131,6 @@ async function loadRepos() {
   allRepos = repos.filter(r => !ignoredSet.has(r.name.toLowerCase()));
 
   renderRepos(allRepos);
-  computeLanguages(allRepos);
 }
 
 function renderRepos(repos) {
@@ -190,26 +189,6 @@ function renderRepos(repos) {
 }
 
 // ===== FEATURED CAROUSEL — REMOVED =====
-
-function computeLanguages(repos) {
-  const langCount = {};
-  repos.forEach(r => {
-    if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1;
-  });
-  const sorted = Object.entries(langCount).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const max = sorted[0]?.[1] || 1;
-  const total = repos.filter(r => r.language).length;
-
-  document.getElementById('languages-chart').innerHTML = sorted.map(([lang, count]) => {
-    const pct = Math.round((count / total) * 100);
-    return `
-      <div class="lang-bar">
-        <span class="lang-name">${lang}</span>
-        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
-        <span class="lang-pct">${pct}%</span>
-      </div>`;
-  }).join('');
-}
 
 // ===== ICON FALLBACK =====
 function repoIconFallback(img) {
@@ -1401,7 +1380,7 @@ function setupRushToggle() {
       '.skill-tag', '.about-detail-tag', '.highlight-item',
       '.repo-card', '.store-card', '.award-card', '.collab-card',
       '.contact-card', '.activity-item', '.timeline-item',
-      '.filter-btn', '.view-btn', '.stat', '.lang-bar',
+      '.filter-btn', '.view-btn', '.stat',
       '.section-title', '.nav-logo', '.nav-links a',
       '.hero-meta span', '.hero-bio', '.store-badge',
       '.modal-topic', '.repo-card-meta span',
