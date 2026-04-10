@@ -1141,6 +1141,14 @@ function setupRateTabs() {
   function initOrbitSocials() {
     const container = document.getElementById('hero-socials');
     if (!container) return;
+
+    // On mobile, skip orbit — CSS handles inline layout
+    if (window.innerWidth <= 768) {
+      container.classList.remove('orbit-mode');
+      container.classList.remove('docked-mode');
+      return;
+    }
+
     const btns = Array.from(container.querySelectorAll('.social-btn'));
     const count = btns.length;
     const wrapper = container.closest('.avatar-orbit-wrapper');
@@ -1159,10 +1167,11 @@ function setupRateTabs() {
     const DOCK_RIGHT = 20;       // px from right viewport edge
     const DOCK_TOP = 68;         // px from top (below nav)
     const DOCK_GAP = 44;         // vertical spacing in docked column
+    const BASE_FLY_LERP = 0.055; // base interpolation speed
 
     const heroSection = document.getElementById('hero');
-    let isDocked = false;
     let flyT = 0;                // smoothed scroll progress 0..1
+    let prevRawScroll = 0;       // previous raw scroll for velocity calc
     let orbitAngle = 0;
     let lastTime = performance.now();
 
@@ -1181,83 +1190,86 @@ function setupRateTabs() {
       const wrapCY = wr.top + wr.height / 2;
       const cursorDist = Math.hypot(mouseX - wrapCX, mouseY - wrapCY);
       const rawProximity = Math.max(0, Math.min(1, 1 - cursorDist / SLOW_RADIUS));
-      // Cubic ease: barely noticeable at edge, strong only when very close
       const proximity = rawProximity * rawProximity * rawProximity;
       const speed = BASE_SPEED + (MIN_SPEED - BASE_SPEED) * proximity;
       orbitAngle += speed * dt;
 
-      /* --- scroll progress --- */
+      /* --- scroll progress with velocity-aware damping --- */
       let rawScroll = 0;
       if (heroSection) {
         const r = heroSection.getBoundingClientRect();
         rawScroll = Math.max(0, Math.min(1, -r.top / (r.height * 0.55)));
       }
-      flyT += (rawScroll - flyT) * 0.07;
 
-      /* --- dock / undock --- */
-      if (flyT > 0.97 && !isDocked) {
-        isDocked = true;
-        container.classList.remove('orbit-mode');
-        container.classList.add('docked-mode');
-        document.body.appendChild(container);
-        btns.forEach(btn => {
-          btn.style.position = '';
-          btn.style.left = '';
-          btn.style.top = '';
-          btn.style.transform = '';
-          btn.style.opacity = '';
-          btn.style.zIndex = '';
-        });
-      } else if (flyT < 0.93 && isDocked) {
-        isDocked = false;
-        container.classList.remove('docked-mode');
-        container.classList.add('orbit-mode');
-        wrapper.appendChild(container);
-      }
+      // Velocity-aware lerp: fast scrolling = heavier damping = smoother
+      const scrollDelta = Math.abs(rawScroll - prevRawScroll);
+      prevRawScroll = rawScroll;
+      const scrollVelocity = Math.min(1, scrollDelta * 10);
+      // Cubic damping: gentle at low speed, strong at high speed
+      const velocityDamping = scrollVelocity * scrollVelocity * scrollVelocity;
+      const adaptiveLerp = BASE_FLY_LERP * (1 - velocityDamping * 0.85);
+      flyT += (rawScroll - flyT) * Math.max(0.008, adaptiveLerp);
 
-      /* --- animate buttons (all in viewport coords via position:fixed) --- */
-      if (!isDocked) {
-        const cx = wr.left + wr.width / 2;
-        const cy = wr.top + wr.height / 2;
-        const halfBtn = BTN_SIZE / 2;
+      /* --- always animate buttons in viewport coords (no DOM manipulation) --- */
+      const cx = wr.left + wr.width / 2;
+      const cy = wr.top + wr.height / 2;
+      const halfBtn = BTN_SIZE / 2;
 
-        // Dock target: vertical column, top-right of viewport
-        const dockX = window.innerWidth - DOCK_RIGHT - BTN_SIZE;
+      // Dock target: vertical column, top-right of viewport
+      const dockX = window.innerWidth - DOCK_RIGHT - BTN_SIZE;
 
-        // Smoothstep for fly interpolation (eases in and out)
-        const st = flyT * flyT * (3 - 2 * flyT);
+      // Hermite smoothstep for butter-smooth fly interpolation
+      const clamped = Math.max(0, Math.min(1, flyT));
+      const st = clamped * clamped * (3 - 2 * clamped);
 
-        btns.forEach((btn, i) => {
-          const baseAngle = (2 * Math.PI * i) / count;
-          const angle = baseAngle + orbitAngle;
+      // Orbit speed winds down as we approach dock
+      const orbitFade = 1 - st;
 
-          // Orbit position in viewport coords
-          const orbX = cx + RADIUS_X * Math.cos(angle) - halfBtn;
-          const orbY = cy + RADIUS_Y * Math.sin(angle) - halfBtn;
+      btns.forEach((btn, i) => {
+        const baseAngle = (2 * Math.PI * i) / count;
+        const angle = baseAngle + orbitAngle;
 
-          // Dock position in viewport coords (vertical column)
-          const dkX = dockX;
-          const dkY = DOCK_TOP + i * DOCK_GAP;
+        // Orbit position in viewport coords
+        const orbX = cx + RADIUS_X * Math.cos(angle) * orbitFade - halfBtn;
+        const orbY = cy + RADIUS_Y * Math.sin(angle) * orbitFade - halfBtn;
 
-          // Depth effects
-          const depth = Math.sin(angle);
-          const scaleOrb = SCALE_BACK + (SCALE_FRONT - SCALE_BACK) * (depth + 1) / 2;
-          const opacityOrb = OPACITY_BACK + (OPACITY_FRONT - OPACITY_BACK) * (depth + 1) / 2;
+        // Dock position — converge to center first, then slide to column
+        const dkX = dockX;
+        const dkY = DOCK_TOP + i * DOCK_GAP;
 
-          // Interpolate orbit → dock
-          const x = orbX + (dkX - orbX) * st;
-          const y = orbY + (dkY - orbY) * st;
-          const sc = scaleOrb + (1 - scaleOrb) * st;
-          const op = opacityOrb + (1 - opacityOrb) * st;
+        // Depth effects fade out as we dock
+        const depth = Math.sin(angle);
+        const scaleOrb = SCALE_BACK + (SCALE_FRONT - SCALE_BACK) * (depth + 1) / 2;
+        const opacityOrb = OPACITY_BACK + (OPACITY_FRONT - OPACITY_BACK) * (depth + 1) / 2;
 
-          btn.style.position = 'fixed';
-          btn.style.left = x + 'px';
-          btn.style.top = y + 'px';
-          btn.style.transform = 'scale(' + sc.toFixed(3) + ')';
-          btn.style.opacity = op.toFixed(3);
-          btn.style.zIndex = depth > 0 ? 3 : 0;
-        });
-      }
+        // Two-phase interpolation for natural arc feel:
+        // Phase 1 (0→0.6): buttons collapse orbit radius toward center
+        // Phase 2 (0.4→1.0): buttons slide to dock positions
+        const collapseT = Math.min(1, st / 0.6);
+        const slideT = Math.max(0, (st - 0.4) / 0.6);
+        const smoothSlide = slideT * slideT * (3 - 2 * slideT);
+
+        // Center position (between orbit center and dock)
+        const midX = cx - halfBtn;
+        const midY = cy - halfBtn + (dkY - cy + halfBtn) * 0.3;
+
+        // Collapse toward center, then slide to dock
+        const x = orbX + (midX - orbX) * collapseT + (dkX - midX) * smoothSlide;
+        const y = orbY + (midY - orbY) * collapseT + (dkY - midY) * smoothSlide;
+        const sc = scaleOrb + (1 - scaleOrb) * st;
+        const op = opacityOrb + (1 - opacityOrb) * st;
+
+        btn.style.position = 'fixed';
+        btn.style.left = x + 'px';
+        btn.style.top = y + 'px';
+        btn.style.transform = 'scale(' + sc.toFixed(3) + ')';
+        btn.style.opacity = op.toFixed(3);
+        btn.style.zIndex = depth > 0 ? 3 : 0;
+      });
+
+      // Toggle docked class for CSS hover styling (no DOM manipulation)
+      container.classList.toggle('docked-mode', flyT > 0.95);
+      container.classList.toggle('orbit-mode', flyT <= 0.95);
 
       requestAnimationFrame(animate);
     }
@@ -1555,5 +1567,391 @@ function setupRateTabs() {
     document.getElementById('avatar').style.visibility = '';
     document.body.style.overflow = '';
     window.scrollTo(0, scrollY0);
+  }
+})();
+
+// ===== LAPLACE TIDAL EQUATIONS — BACKGROUND CANVAS =====
+// Simulates shallow-water tidal waves using the linearized Laplace tidal equations:
+//   ∂η/∂t = -H(∂u/∂x + ∂v/∂y)      (continuity)
+//   ∂u/∂t = -g·∂η/∂x + f·v           (x-momentum with Coriolis)
+//   ∂v/∂t = -g·∂η/∂y - f·u           (y-momentum with Coriolis)
+// where η = surface elevation, u,v = velocity, H = mean depth, g = gravity, f = Coriolis
+(function () {
+  const canvas = document.getElementById('tidal-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  // Simulation grid — keep coarse for performance
+  const NX = 120, NY = 80;
+  const g = 9.81;         // gravity (m/s²)
+  const H = 10.0;         // mean water depth (m)
+  const f = 0.00004;      // Coriolis parameter (subtle rotation effect)
+  const dt = 0.25;        // time step
+  const dx = 1.0;         // grid spacing
+
+  // State arrays (flat for perf)
+  let eta = new Float32Array(NX * NY);   // surface elevation
+  let u   = new Float32Array(NX * NY);   // x-velocity
+  let v   = new Float32Array(NX * NY);   // y-velocity
+  let etaN = new Float32Array(NX * NY);
+  let uN  = new Float32Array(NX * NY);
+  let vN  = new Float32Array(NX * NY);
+
+  // Tidal forcing — simulate a semi-diurnal tide from the top
+  let simTime = 0;
+  const OMEGA1 = 0.012;   // primary tidal frequency
+  const OMEGA2 = 0.0073;  // secondary (creates interference)
+  const AMP1 = 0.6;
+  const AMP2 = 0.3;
+  const DAMPING = 0.997;  // slight energy dissipation
+
+  function idx(x, y) { return y * NX + x; }
+
+  function step() {
+    simTime += dt;
+
+    // Apply tidal forcing along top boundary (simulates tidal source)
+    for (let x = 0; x < NX; x++) {
+      const phase1 = OMEGA1 * simTime + x * 0.08;
+      const phase2 = OMEGA2 * simTime - x * 0.05 + 1.3;
+      eta[idx(x, 0)] = AMP1 * Math.sin(phase1) + AMP2 * Math.sin(phase2);
+    }
+
+    // Update velocities (momentum equations with Coriolis)
+    for (let y = 1; y < NY - 1; y++) {
+      for (let x = 1; x < NX - 1; x++) {
+        const i = idx(x, y);
+        const deta_dx = (eta[idx(x + 1, y)] - eta[idx(x - 1, y)]) / (2 * dx);
+        const deta_dy = (eta[idx(x, y + 1)] - eta[idx(x, y - 1)]) / (2 * dx);
+        uN[i] = (u[i] + dt * (-g * deta_dx + f * v[i])) * DAMPING;
+        vN[i] = (v[i] + dt * (-g * deta_dy - f * u[i])) * DAMPING;
+      }
+    }
+
+    // Update surface elevation (continuity equation)
+    for (let y = 1; y < NY - 1; y++) {
+      for (let x = 1; x < NX - 1; x++) {
+        const i = idx(x, y);
+        const du_dx = (uN[idx(x + 1, y)] - uN[idx(x - 1, y)]) / (2 * dx);
+        const dv_dy = (uN[idx(x, y + 1)] - uN[idx(x, y - 1)]) / (2 * dx);
+        etaN[i] = (eta[i] - dt * H * (du_dx + dv_dy)) * DAMPING;
+      }
+    }
+
+    // Open boundary condition (bottom) — absorbing
+    for (let x = 0; x < NX; x++) {
+      const yb = NY - 1;
+      etaN[idx(x, yb)] = etaN[idx(x, yb - 1)] * 0.95;
+      uN[idx(x, yb)] = uN[idx(x, yb - 1)] * 0.95;
+      vN[idx(x, yb)] = vN[idx(x, yb - 1)] * 0.95;
+    }
+
+    // Side boundaries — reflective
+    for (let y = 0; y < NY; y++) {
+      uN[idx(0, y)] = 0;
+      uN[idx(NX - 1, y)] = 0;
+      etaN[idx(0, y)] = etaN[idx(1, y)];
+      etaN[idx(NX - 1, y)] = etaN[idx(NX - 2, y)];
+    }
+
+    // Swap buffers
+    [eta, etaN] = [etaN, eta];
+    [u, uN] = [uN, u];
+    [v, vN] = [vN, v];
+  }
+
+  // Rendering
+  let imgData;
+  function render() {
+    if (!imgData || imgData.width !== NX || imgData.height !== NY) {
+      imgData = ctx.createImageData(NX, NY);
+    }
+    const data = imgData.data;
+    for (let y = 0; y < NY; y++) {
+      for (let x = 0; x < NX; x++) {
+        const i = idx(x, y);
+        const p = (y * NX + x) * 4;
+        // Map elevation to subtle blue luminance
+        const val = eta[i];
+        const brightness = Math.max(0, Math.min(255, 128 + val * 180));
+        // Deep ocean blue tint
+        data[p]     = brightness * 0.15 | 0;  // R
+        data[p + 1] = brightness * 0.25 | 0;  // G
+        data[p + 2] = brightness * 0.7  | 0;  // B
+        // Vertical fade: full at top, fading to transparent at bottom
+        const fadeY = 1.0 - (y / NY) * (y / NY);
+        data[p + 3] = (brightness * 0.6 * fadeY) | 0;  // A
+      }
+    }
+    ctx.putImageData(imgData, 0, 0);
+  }
+
+  function resize() {
+    canvas.width = NX;
+    canvas.height = NY;
+    // CSS handles the stretching to full size
+  }
+
+  let animId;
+  let stepsPerFrame = 3;
+
+  function tick() {
+    for (let s = 0; s < stepsPerFrame; s++) step();
+    render();
+    animId = requestAnimationFrame(tick);
+  }
+
+  // Run while hero + experience sections are visible; fade based on scroll
+  let tidalRunning = false;
+  const heroEl = document.getElementById('hero');
+  const expEl = document.getElementById('experience');
+
+  function checkVisibility() {
+    if (!heroEl) return;
+    const heroRect = heroEl.getBoundingClientRect();
+    const expRect = expEl ? expEl.getBoundingClientRect() : null;
+
+    // Bottom of the tidal region: end of experience section (or hero if no experience)
+    const regionBottom = expRect ? expRect.bottom : heroRect.bottom;
+    const visible = regionBottom > 0 && heroRect.top < window.innerHeight;
+
+    // Scroll-based opacity: full in hero, fading through experience
+    if (visible) {
+      const scrollPast = Math.max(0, -heroRect.top);
+      const fadeStart = heroRect.height * 0.4;
+      const fadeEnd = heroRect.height + (expRect ? expRect.height * 0.8 : 0);
+      let opacity = 0.18;
+      if (scrollPast > fadeStart && fadeEnd > fadeStart) {
+        const fadeProgress = Math.min(1, (scrollPast - fadeStart) / (fadeEnd - fadeStart));
+        // Smooth cubic fade out
+        opacity = 0.18 * (1 - fadeProgress * fadeProgress * fadeProgress);
+      }
+      canvas.style.opacity = Math.max(0, opacity);
+    }
+
+    if (visible && !tidalRunning) {
+      tidalRunning = true;
+      tick();
+    } else if (!visible && tidalRunning) {
+      tidalRunning = false;
+      canvas.style.opacity = '0';
+      cancelAnimationFrame(animId);
+    }
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  window.addEventListener('scroll', checkVisibility, { passive: true });
+  checkVisibility();
+})();
+
+// ===== ENHANCED SCROLL ANIMATIONS =====
+(function () {
+  const EASE_OUT = 'cubic-bezier(0.25,0.46,0.45,0.94)';
+
+  // Staggered reveal for grid children — alternating slide directions
+  function setupStaggeredAnimations() {
+    const staggerContainers = document.querySelectorAll(
+      '.skills-grid, .services-grid, .project-rates-grid, .collab-grid, .store-grid'
+    );
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const children = Array.from(entry.target.children);
+          children.forEach((child, i) => {
+            // Alternate entrance: even from left, odd from right
+            const dir = i % 2 === 0 ? -1 : 1;
+            child.style.opacity = '0';
+            child.style.transform = `translateX(${dir * 30}px) translateY(15px)`;
+            child.style.transition = `opacity 0.55s ${EASE_OUT} ${i * 0.07}s, transform 0.55s ${EASE_OUT} ${i * 0.07}s`;
+            requestAnimationFrame(() => {
+              requestAnimationFrame(() => {
+                child.style.opacity = '1';
+                child.style.transform = 'translateX(0) translateY(0)';
+              });
+            });
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.05 });
+
+    staggerContainers.forEach(c => observer.observe(c));
+  }
+
+  // Timeline slide-in from left with scale pop
+  function setupTimelineAnimations() {
+    const items = document.querySelectorAll('.timeline-item');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateX(0) scale(1)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+
+    items.forEach((item, i) => {
+      item.style.opacity = '0';
+      item.style.transform = 'translateX(-30px) scale(0.97)';
+      item.style.transition = `opacity 0.55s ease ${i * 0.1}s, transform 0.55s ease ${i * 0.1}s`;
+      observer.observe(item);
+    });
+  }
+
+  // Section title reveal with scale
+  function setupTitleAnimations() {
+    const titles = document.querySelectorAll('.section-title');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('revealed');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    titles.forEach(t => observer.observe(t));
+  }
+
+  // Hero content entrance — gentle float up with fade
+  function setupHeroEntrance() {
+    const heroContent = document.querySelector('.hero-content');
+    if (!heroContent) return;
+    const children = heroContent.children;
+    Array.from(children).forEach((child, i) => {
+      child.style.opacity = '0';
+      child.style.transform = 'translateY(25px)';
+      child.style.transition = `opacity 0.7s ${EASE_OUT} ${0.2 + i * 0.12}s, transform 0.7s ${EASE_OUT} ${0.2 + i * 0.12}s`;
+    });
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        Array.from(children).forEach(child => {
+          child.style.opacity = '1';
+          child.style.transform = 'translateY(0)';
+        });
+      });
+    });
+  }
+
+  // Skill tags hover ripple
+  function setupSkillTagAnimations() {
+    document.querySelectorAll('.skill-tag').forEach(tag => {
+      tag.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.05)';
+        this.style.borderColor = '#444';
+      });
+      tag.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1)';
+        this.style.borderColor = '';
+      });
+    });
+  }
+
+  // Parallax float on hero — subtle depth on scroll
+  function setupHeroParallax() {
+    const hero = document.getElementById('hero');
+    const heroContent = document.querySelector('.hero-content');
+    if (!hero || !heroContent) return;
+
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const rect = hero.getBoundingClientRect();
+        if (rect.bottom > 0 && rect.top < window.innerHeight) {
+          const progress = -rect.top / rect.height;
+          heroContent.style.transform = 'translateY(' + (progress * 40) + 'px)';
+          heroContent.style.opacity = Math.max(0, 1 - progress * 1.3);
+        }
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
+  // Animated stat counters (for elements with data-count attribute)
+  function setupCounters() {
+    const counters = document.querySelectorAll('[data-count]');
+    if (!counters.length) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-count'), 10);
+          const suffix = el.getAttribute('data-suffix') || '';
+          if (isNaN(target)) return;
+          const duration = 1200;
+          const start = performance.now();
+          function update(now) {
+            const elapsed = now - start;
+            const progress = Math.min(1, elapsed / duration);
+            // Ease-out cubic
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(target * eased) + suffix;
+            if (progress < 1) requestAnimationFrame(update);
+          }
+          requestAnimationFrame(update);
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(c => observer.observe(c));
+  }
+
+  // Section separator line draw animation
+  function setupSectionSeparators() {
+    const sections = document.querySelectorAll('.content-section');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('section-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08 });
+
+    sections.forEach(s => observer.observe(s));
+  }
+
+  // Card tilt on hover — subtle 3D perspective
+  function setupCardTilt() {
+    const cards = document.querySelectorAll('.repo-card, .collab-card, .store-card');
+    cards.forEach(card => {
+      card.addEventListener('mousemove', function(e) {
+        const rect = this.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width - 0.5;
+        const y = (e.clientY - rect.top) / rect.height - 0.5;
+        this.style.transform = `perspective(600px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) translateY(-2px)`;
+      });
+      card.addEventListener('mouseleave', function() {
+        this.style.transform = '';
+        this.style.transition = 'transform 0.4s ease';
+        setTimeout(() => { this.style.transition = ''; }, 400);
+      });
+    });
+  }
+
+  // Init all enhanced animations after DOM + data loads
+  function initEnhanced() {
+    setupStaggeredAnimations();
+    setupTimelineAnimations();
+    setupTitleAnimations();
+    setupHeroEntrance();
+    setupSkillTagAnimations();
+    setupHeroParallax();
+    setupCounters();
+    setupSectionSeparators();
+    setupCardTilt();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initEnhanced, 100));
+  } else {
+    setTimeout(initEnhanced, 100);
   }
 })();

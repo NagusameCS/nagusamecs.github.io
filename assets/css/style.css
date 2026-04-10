@@ -213,6 +213,20 @@ section {
   text-align: center;
   position: relative;
   padding: 120px 24px 80px;
+  overflow: hidden;
+}
+
+/* Laplace tidal canvas — fixed so it scrolls through hero + experience */
+#tidal-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  image-rendering: auto;
 }
 .hero-bg {
   display: none;
@@ -1519,20 +1533,18 @@ section {
   transition: none;
 }
 
-/* DOCKED MODE — fixed vertical column below nav */
+/* DOCKED MODE — buttons positioned by JS, this just adds hover interactivity */
 .hero-socials.docked-mode {
   position: fixed;
-  top: 64px;
-  right: 20px;
+  top: 0;
+  right: 0;
   z-index: 999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
 }
 .hero-socials.docked-mode .social-btn {
-  position: static;
-  transform: none !important;
-  opacity: 1 !important;
+  pointer-events: auto;
   transition: color 0.3s, border-color 0.3s, background 0.3s;
 }
 
@@ -1587,124 +1599,494 @@ footer {
   transform: translateY(0);
 }
 
+/* Section title reveal animation */
+.section-title {
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transition: opacity 0.6s cubic-bezier(0.25,0.46,0.45,0.94),
+              transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.section-title.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.section-title::after {
+  transition: width 0.6s cubic-bezier(0.25,0.46,0.45,0.94) 0.2s;
+  width: 0;
+}
+.section-title.revealed::after {
+  width: 40px;
+}
+
+/* Skill tag hover */
+.skill-tag {
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  cursor: default;
+}
+.skill-tag:hover {
+  background: var(--bg-secondary);
+}
+
+/* Service card entrance */
+.service-card,
+.project-rate-card {
+  transition: border-color var(--transition), transform 0.3s ease, box-shadow 0.3s ease;
+}
+.service-card:hover,
+.project-rate-card:hover {
+  border-color: #444;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+/* Repo card hover lift */
+.repo-card {
+  transition: all 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.repo-card:hover {
+  border-color: #444;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+}
+
+/* Timeline icon pulse on reveal */
+.timeline-icon {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.timeline-item:hover .timeline-icon {
+  transform: scale(1.15);
+  box-shadow: 0 0 12px rgba(255,255,255,0.08);
+}
+
+/* Collab & store card hover */
+.collab-card:hover,
+.store-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.collab-card,
+.store-card {
+  transition: all 0.3s ease;
+}
+
+/* Nav slide transition for mobile */
+.nav-links {
+  transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease;
+}
+
 /* ===== MOBILE BUSINESS CARD ===== */
 #mobile-card {
   display: none;
 }
 
 @media (max-width: 768px) {
+  /* Hide the old business card — show real site */
   #mobile-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding: 24px;
-    background: var(--bg-primary);
-  }
-  .card-inner {
-    width: 100%;
-    max-width: 360px;
-    text-align: center;
-    padding: 40px 28px;
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    animation: cardFadeIn 0.5s ease;
-  }
-  @keyframes cardFadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .card-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--border);
-    margin-bottom: 16px;
-  }
-  .card-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 0 0 4px;
-    letter-spacing: 0.5px;
-  }
-  .card-title {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    margin: 0 0 16px;
-    line-height: 1.4;
-  }
-  .card-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 20px;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
-  .card-meta a {
-    color: var(--text-secondary);
-  }
-  .card-meta i {
-    width: 16px;
-    text-align: center;
-    margin-right: 6px;
-    opacity: 0.6;
-  }
-  .card-socials {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-  .card-socials a {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    transition: all 0.2s ease;
-  }
-  .card-socials a:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary);
-    transform: translateY(-2px);
-  }
-  .card-divider {
-    height: 1px;
-    background: var(--border);
-    margin-bottom: 16px;
-  }
-  .card-hint {
-    font-size: 0.72rem;
-    color: var(--text-muted);
-    margin: 0;
-    letter-spacing: 0.3px;
-    opacity: 0.7;
-  }
-  .card-hint i {
-    margin-right: 6px;
-    opacity: 0.5;
+    display: none !important;
   }
 
-  /* Hide full site on mobile */
+  /* Show full site on mobile */
   #navbar,
   #hero,
   .tab-group,
   footer {
+    display: block !important;
+  }
+  .tab-group:not(.active) {
     display: none !important;
+  }
+
+  /* Nav responsive */
+  .nav-container {
+    height: 52px;
+    padding: 0 16px;
+  }
+  .nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+  }
+  .nav-links {
+    position: fixed;
+    top: 52px;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.96);
+    backdrop-filter: blur(12px);
+    flex-direction: column;
+    padding: 16px;
+    gap: 4px;
+    border-bottom: 1px solid var(--border);
+    transform: translateY(-110%);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 999;
+  }
+  .nav-links.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .nav-links a {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+  .nav-sep {
+    display: none;
+  }
+
+  /* Hero mobile */
+  #hero {
+    min-height: auto;
+    padding: 100px 20px 60px;
+    text-align: center;
+  }
+  #hero h1 {
+    font-size: 1.8rem;
+    line-height: 1.15;
+  }
+  .hero-bio {
+    font-size: 0.9rem;
+    max-width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-avatar {
+    width: 100px;
+    height: 100px;
+  }
+  .avatar-orbit-wrapper {
+    width: 160px;
+    height: 160px;
+  }
+  .hero-meta {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 0.8rem;
+  }
+
+  /* Hide orbit socials on mobile — show inline row */
+  .hero-socials.orbit-mode,
+  .hero-socials.docked-mode {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 16px;
+    pointer-events: auto;
+  }
+  .hero-socials .social-btn {
+    position: static !important;
+    transform: none !important;
+    opacity: 1 !important;
+    width: 40px;
+    height: 40px;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+  .hero-socials .social-btn:active {
+    transform: scale(0.92) !important;
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* Stats mobile */
+  .hero-stats {
+    gap: 24px;
+    justify-content: center;
+  }
+  .stat-num {
+    font-size: 1.2rem;
+  }
+
+  /* Sections mobile — breathing room */
+  section {
+    padding: 48px 0;
+  }
+  .container {
+    padding: 0 18px;
+  }
+  .section-title {
+    font-size: 1.15rem;
+    margin-bottom: 1.25rem;
+  }
+  .content-section {
+    padding: 48px 0;
+  }
+
+  /* Skills layout — stack on mobile */
+  .skills-experience-row {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .skills-experience-row > .timeline {
+    min-width: 0;
+  }
+  .skills-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .skill-category {
+    padding: 16px;
+    border-radius: 10px;
+  }
+  .skill-category h3 {
+    font-size: 0.88rem;
+    margin-bottom: 10px;
+  }
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .skill-tag {
+    font-size: 0.72rem;
+    padding: 4px 9px;
+  }
+
+  /* Timeline mobile — tighter layout */
+  .timeline {
+    padding-left: 16px;
+  }
+  .timeline-item {
+    padding-left: 24px;
+    margin-bottom: 20px;
+  }
+  .timeline-item h3 {
+    font-size: 0.92rem;
+  }
+  .timeline-item .timeline-date {
+    font-size: 0.72rem;
+  }
+
+  /* Services grid */
+  .services-grid,
+  .project-rates-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .service-card,
+  .project-rate-card {
+    padding: 18px;
+    border-radius: 10px;
+  }
+  .service-card h3,
+  .project-rate-card h3 {
+    font-size: 0.95rem;
+  }
+
+  /* Repo grid */
+  .repo-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .repo-controls {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .repo-search {
+    max-width: 100%;
+    width: 100%;
+  }
+  .repo-card {
+    padding: 16px;
+    border-radius: 10px;
+  }
+
+  /* Collab + Store */
+  .collab-grid,
+  .store-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .collab-card,
+  .store-card {
+    border-radius: 10px;
+  }
+
+  /* Activity */
+  .graph-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .graph-stat-group {
+    gap: 16px;
+  }
+  .activity-item {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 10px 0;
+  }
+  .activity-item .activity-time {
+    width: 100%;
+    text-align: right;
+  }
+
+  /* Rate tabs */
+  .rate-type-tabs {
+    width: 100%;
+  }
+  .rate-tab {
+    flex: 1;
+    text-align: center;
+    padding: 8px 6px;
+    font-size: 0.78rem;
+  }
+
+  /* Currency */
+  .currency-selector {
+    gap: 4px;
+  }
+  .currency-btn {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+  }
+
+  /* Modal mobile — full-screen feel */
+  .modal {
+    padding: 8px;
+  }
+  .modal-content {
+    padding: 18px;
+    max-height: 96vh;
+    border-radius: 12px;
+  }
+  .modal-header {
+    gap: 10px;
+  }
+  .modal-header h2 {
+    font-size: 1.1rem;
+  }
+  .modal-tabs {
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-tab {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+    white-space: nowrap;
+  }
+
+  /* Tab switching */
+  .tab-header {
+    gap: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+  .tab-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 0.82rem;
+  }
+
+  /* Contract section */
+  .contract-intro {
+    font-size: 0.82rem;
+  }
+
+  /* Tidal canvas on mobile */
+  #tidal-canvas {
+    opacity: 0.12;
+  }
+
+  /* Footer */
+  footer {
+    padding: 20px 0;
+  }
+
+  /* Mobile touch feedback for interactive elements */
+  .repo-card:active,
+  .collab-card:active,
+  .store-card:active,
+  .service-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+
+  /* Smooth section entrance on mobile */
+  .content-section {
+    transition: opacity 0.5s ease;
+  }
+  .content-section.section-visible {
+    opacity: 1;
   }
 }
 
 /* ===== RESPONSIVE ===== */
+
+/* Small phones */
+@media (max-width: 400px) {
+  #hero {
+    padding: 90px 16px 48px;
+  }
+  #hero h1 {
+    font-size: 1.4rem;
+  }
+  .hero-bio {
+    font-size: 0.82rem;
+  }
+  .hero-avatar {
+    width: 80px;
+    height: 80px;
+  }
+  .avatar-orbit-wrapper {
+    width: 130px;
+    height: 130px;
+  }
+  .hero-socials .social-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .hero-stats {
+    gap: 16px;
+  }
+  .stat-num {
+    font-size: 1rem;
+  }
+  .stat-label {
+    font-size: 0.62rem;
+  }
+  .skill-category {
+    padding: 14px;
+  }
+  .service-card {
+    padding: 16px;
+  }
+  .modal-content {
+    padding: 14px;
+  }
+  .container {
+    padding: 0 14px;
+  }
+  section {
+    padding: 40px 0;
+  }
+}
+
+/* Section entrance animation — used by JS IntersectionObserver */
+.content-section {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.6s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.content-section.section-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card tilt perspective container */
+.repo-card,
+.collab-card,
+.store-card {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
