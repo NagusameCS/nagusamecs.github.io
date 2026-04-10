@@ -1701,40 +1701,19 @@ function setupRateTabs() {
     animId = requestAnimationFrame(tick);
   }
 
-  // Run while hero + experience sections are visible; fade based on scroll
+  // Only run when hero is visible
   let tidalRunning = false;
   const heroEl = document.getElementById('hero');
-  const expEl = document.getElementById('experience');
 
   function checkVisibility() {
     if (!heroEl) return;
-    const heroRect = heroEl.getBoundingClientRect();
-    const expRect = expEl ? expEl.getBoundingClientRect() : null;
-
-    // Bottom of the tidal region: end of experience section (or hero if no experience)
-    const regionBottom = expRect ? expRect.bottom : heroRect.bottom;
-    const visible = regionBottom > 0 && heroRect.top < window.innerHeight;
-
-    // Scroll-based opacity: full in hero, fading through experience
-    if (visible) {
-      const scrollPast = Math.max(0, -heroRect.top);
-      const fadeStart = heroRect.height * 0.4;
-      const fadeEnd = heroRect.height + (expRect ? expRect.height * 0.8 : 0);
-      let opacity = 0.18;
-      if (scrollPast > fadeStart && fadeEnd > fadeStart) {
-        const fadeProgress = Math.min(1, (scrollPast - fadeStart) / (fadeEnd - fadeStart));
-        // Smooth cubic fade out
-        opacity = 0.18 * (1 - fadeProgress * fadeProgress * fadeProgress);
-      }
-      canvas.style.opacity = Math.max(0, opacity);
-    }
-
+    const rect = heroEl.getBoundingClientRect();
+    const visible = rect.bottom > 0 && rect.top < window.innerHeight;
     if (visible && !tidalRunning) {
       tidalRunning = true;
       tick();
     } else if (!visible && tidalRunning) {
       tidalRunning = false;
-      canvas.style.opacity = '0';
       cancelAnimationFrame(animId);
     }
   }
@@ -1817,18 +1796,22 @@ function setupRateTabs() {
   }
 
   // Hero content entrance — gentle float up with fade
+  // Skip avatar-orbit-wrapper: its children use position:fixed and
+  // any transform on an ancestor breaks that.
   function setupHeroEntrance() {
     const heroContent = document.querySelector('.hero-content');
     if (!heroContent) return;
-    const children = heroContent.children;
-    Array.from(children).forEach((child, i) => {
+    const children = Array.from(heroContent.children).filter(
+      c => !c.classList.contains('avatar-orbit-wrapper')
+    );
+    children.forEach((child, i) => {
       child.style.opacity = '0';
       child.style.transform = 'translateY(25px)';
       child.style.transition = `opacity 0.7s ${EASE_OUT} ${0.2 + i * 0.12}s, transform 0.7s ${EASE_OUT} ${0.2 + i * 0.12}s`;
     });
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        Array.from(children).forEach(child => {
+        children.forEach(child => {
           child.style.opacity = '1';
           child.style.transform = 'translateY(0)';
         });
@@ -1851,10 +1834,16 @@ function setupRateTabs() {
   }
 
   // Parallax float on hero — subtle depth on scroll
+  // Apply per-child, skipping avatar-orbit-wrapper to preserve position:fixed socials.
   function setupHeroParallax() {
     const hero = document.getElementById('hero');
     const heroContent = document.querySelector('.hero-content');
     if (!hero || !heroContent) return;
+
+    const parallaxChildren = Array.from(heroContent.children).filter(
+      c => !c.classList.contains('avatar-orbit-wrapper')
+    );
+    if (!parallaxChildren.length) return;
 
     let ticking = false;
     window.addEventListener('scroll', function() {
@@ -1864,8 +1853,12 @@ function setupRateTabs() {
         const rect = hero.getBoundingClientRect();
         if (rect.bottom > 0 && rect.top < window.innerHeight) {
           const progress = -rect.top / rect.height;
-          heroContent.style.transform = 'translateY(' + (progress * 40) + 'px)';
-          heroContent.style.opacity = Math.max(0, 1 - progress * 1.3);
+          const ty = (progress * 40).toFixed(1);
+          const op = Math.max(0, 1 - progress * 1.3);
+          parallaxChildren.forEach(child => {
+            child.style.transform = 'translateY(' + ty + 'px)';
+            child.style.opacity = op;
+          });
         }
         ticking = false;
       });
