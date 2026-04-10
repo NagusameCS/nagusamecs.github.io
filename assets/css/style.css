@@ -216,17 +216,6 @@ section {
   overflow: hidden;
 }
 
-/* Laplace tidal canvas */
-#tidal-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.35;
-}
 .hero-bg {
   display: none;
 }
@@ -1990,11 +1979,6 @@ footer {
   /* Contract section */
   .contract-intro {
     font-size: 0.82rem;
-  }
-
-  /* Tidal canvas on mobile */
-  #tidal-canvas {
-    opacity: 0.25;
   }
 
   /* Footer */
