@@ -225,7 +225,7 @@ section {
   height: 100%;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.18;
+  opacity: 0.35;
 }
 .hero-bg {
   display: none;
@@ -747,6 +747,9 @@ section {
   padding: 28px;
   position: relative;
   animation: slideUp 0.2s ease;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.15s ease;
 }
 .modal-content::-webkit-scrollbar {
   display: none;
@@ -1991,7 +1994,7 @@ footer {
 
   /* Tidal canvas on mobile */
   #tidal-canvas {
-    opacity: 0.12;
+    opacity: 0.25;
   }
 
   /* Footer */

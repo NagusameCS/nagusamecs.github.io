@@ -1671,16 +1671,16 @@ function setupRateTabs() {
       for (let x = 0; x < NX; x++) {
         const i = idx(x, y);
         const p = (y * NX + x) * 4;
-        // Map elevation to subtle blue luminance
+        // Map elevation to visible blue luminance
         const val = eta[i];
-        const brightness = Math.max(0, Math.min(255, 128 + val * 180));
-        // Deep ocean blue tint
-        data[p]     = brightness * 0.15 | 0;  // R
-        data[p + 1] = brightness * 0.25 | 0;  // G
-        data[p + 2] = brightness * 0.7  | 0;  // B
+        const brightness = Math.max(0, Math.min(255, 128 + val * 350));
+        // Deep ocean blue tint — brighter so it's visible at low CSS opacity
+        data[p]     = brightness * 0.18 | 0;  // R
+        data[p + 1] = brightness * 0.35 | 0;  // G
+        data[p + 2] = brightness * 0.85 | 0;  // B
         // Vertical fade: full at top, fading to transparent at bottom
         const fadeY = 1.0 - (y / NY) * (y / NY);
-        data[p + 3] = (brightness * 0.6 * fadeY) | 0;  // A
+        data[p + 3] = Math.min(255, (brightness * 0.9 * fadeY) | 0);  // A
       }
     }
     ctx.putImageData(imgData, 0, 0);
@@ -1946,5 +1946,54 @@ function setupRateTabs() {
     document.addEventListener('DOMContentLoaded', () => setTimeout(initEnhanced, 100));
   } else {
     setTimeout(initEnhanced, 100);
+  }
+})();
+
+// ===== MODAL TILT ON MOUSE MOVE =====
+(function () {
+  const MAX_TILT = 2.5; // degrees — keep it subtle
+
+  document.addEventListener('mousemove', function (e) {
+    const modal = document.querySelector('.modal.active');
+    if (!modal) return;
+    const content = modal.querySelector('.modal-content');
+    if (!content) return;
+
+    const rect = content.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;  // -0.5..0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+
+    // Only tilt when cursor is reasonably near the modal
+    const margin = 100;
+    if (e.clientX < rect.left - margin || e.clientX > rect.right + margin ||
+        e.clientY < rect.top - margin || e.clientY > rect.bottom + margin) {
+      content.style.transform = '';
+      return;
+    }
+
+    content.style.transform =
+      'perspective(900px) rotateY(' + (x * MAX_TILT).toFixed(2) + 'deg) rotateX(' + (-y * MAX_TILT).toFixed(2) + 'deg)';
+  });
+
+  // Reset on close
+  const observer = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      if (m.target.classList && !m.target.classList.contains('active')) {
+        const content = m.target.querySelector('.modal-content');
+        if (content) content.style.transform = '';
+      }
+    });
+  });
+
+  function init() {
+    document.querySelectorAll('.modal').forEach(function (modal) {
+      observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();
