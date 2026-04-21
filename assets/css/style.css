@@ -514,6 +514,75 @@ section {
 }
 
 /* ===== REPOSITORIES ===== */
+.tensor-intro {
+  max-width: 760px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.tensor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+
+.tensor-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: border-color var(--transition), transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tensor-card:hover {
+  border-color: #444;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+
+.tensor-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tensor-card-header i {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+}
+
+.tensor-card h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.tensor-card p {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.tensor-highlights {
+  list-style: none;
+  margin-bottom: 14px;
+}
+
+.tensor-highlights li {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.tensor-highlights li::before {
+  content: '> ';
+  color: var(--text-secondary);
+}
+
 .repo-controls {
   display: flex;
   justify-content: center;
@@ -1871,6 +1940,10 @@ footer {
 
   /* Repo grid */
   .repo-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .tensor-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }

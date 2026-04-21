@@ -41,15 +41,16 @@
         <i class="fas fa-bars"></i>
       </button>
       <ul class="nav-links">
-        <li><a href="#" class="nav-tab active" data-tab="tab-main">Portfolio</a></li>
-        <li><a href="#" class="nav-tab" data-tab="tab-projects">Projects</a></li>
+        <li><a href="#" class="nav-tab active" data-tab="tab-projects">Portfolio</a></li>
+        <li><a href="#" class="nav-tab" data-tab="tab-main">Projects</a></li>
         <li class="nav-sep">|</li>
-        <li class="nav-section-links" data-for="tab-main"><a href="#experience">Skills &amp; Experience</a></li>
-        <li class="nav-section-links" data-for="tab-main"><a href="#contract">Services</a></li>
-        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#repositories">Projects</a></li>
-        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#collaborations">Collaborations</a></li>
-        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#store-apps">Apps &amp; Extensions</a></li>
-        <li class="nav-section-links" data-for="tab-projects" style="display:none"><a href="#activity">Activity</a></li>
+        <li class="nav-section-links" data-for="tab-main" style="display:none"><a href="#experience">Skills &amp; Experience</a></li>
+        <li class="nav-section-links" data-for="tab-main" style="display:none"><a href="#contract">Services</a></li>
+        <li class="nav-section-links" data-for="tab-projects"><a href="#tensor-projects">TensorOS &amp; HyperTensor</a></li>
+        <li class="nav-section-links" data-for="tab-projects"><a href="#repositories">Projects</a></li>
+        <li class="nav-section-links" data-for="tab-projects"><a href="#collaborations">Collaborations</a></li>
+        <li class="nav-section-links" data-for="tab-projects"><a href="#store-apps">Apps &amp; Extensions</a></li>
+        <li class="nav-section-links" data-for="tab-projects"><a href="#activity">Activity</a></li>
       </ul>
     </div>
   </nav>
@@ -90,7 +91,7 @@
   </section>
 
   <!-- Tab: Portfolio (default) -->
-  <div id="tab-main" class="tab-group active">
+  <div id="tab-main" class="tab-group">
 
   <!-- Skills & Experience Section -->
   <section id="experience" class="content-section">
@@ -939,7 +940,43 @@
   </div><!-- /tab-main -->
 
   <!-- Tab: Projects -->
-  <div id="tab-projects" class="tab-group">
+  <div id="tab-projects" class="tab-group active">
+
+  <!-- Tensor Projects Section -->
+  <section id="tensor-projects" class="content-section">
+    <div class="container">
+      <h2 class="section-title"><span>TensorOS &amp; HyperTensor</span></h2>
+      <p class="tensor-intro">A dedicated focus area for my systems and compute work. TensorOS explores custom OS-level architecture, while HyperTensor pushes high-performance tensor runtimes and tooling.</p>
+      <div class="tensor-grid">
+        <article class="tensor-card">
+          <div class="tensor-card-header">
+            <i class="fas fa-microchip"></i>
+            <h3>TensorOS</h3>
+          </div>
+          <p>Operating-system engineering focused on kernel architecture, memory behavior, and low-level execution pathways for advanced workloads.</p>
+          <ul class="tensor-highlights">
+            <li>Kernel-level experimentation</li>
+            <li>Systems primitives and runtime internals</li>
+            <li>Architecture-first design and diagnostics</li>
+          </ul>
+          <a href="https://github.com/NagusameCS/TensorOS" target="_blank" class="btn btn-secondary"><i class="fab fa-github"></i> Explore TensorOS</a>
+        </article>
+        <article class="tensor-card">
+          <div class="tensor-card-header">
+            <i class="fas fa-brain"></i>
+            <h3>HyperTensor</h3>
+          </div>
+          <p>Tensor runtime and infrastructure work centered on performance, model execution efficiency, and practical acceleration across ML workflows.</p>
+          <ul class="tensor-highlights">
+            <li>High-throughput tensor pipelines</li>
+            <li>Performance profiling and optimization</li>
+            <li>Developer-focused compute tooling</li>
+          </ul>
+          <a href="https://github.com/NagusameCS/HyperTensor" target="_blank" class="btn btn-secondary"><i class="fab fa-github"></i> Explore HyperTensor</a>
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- Repositories Section -->
   <section id="repositories" class="content-section">
