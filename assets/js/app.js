@@ -1132,6 +1132,24 @@ function setupWireframeManifold() {
   window.addEventListener('beforeunload', () => cancelAnimationFrame(animId));
 }
 
+// ===== TIMELINE ERA FILTER =====
+function setupTimelineEraFilter() {
+  const tabs = document.querySelectorAll('.era-tab');
+  const items = document.querySelectorAll('.timeline-item[data-era]');
+  if (!tabs.length || !items.length) return;
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const era = tab.dataset.era;
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      items.forEach(item => {
+        item.setAttribute('aria-hidden', item.dataset.era !== era ? 'true' : 'false');
+      });
+    });
+  });
+}
+
 // ===== INIT =====
 document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -1140,6 +1158,7 @@ async function init() {
   setupModal();
   setupFilters();
   setupWireframeManifold();
+  setupTimelineEraFilter();
 
   // Load everything in parallel
   await Promise.allSettled([
