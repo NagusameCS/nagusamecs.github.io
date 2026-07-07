@@ -541,21 +541,21 @@ async function loadStoreApps() {
   const enriched = await Promise.all(items.map(item => enrichStoreItem(item)));
 
   grid.innerHTML = enriched.map(item => {
-    const iconHtml = item.icon
-      ? `<img class="store-card-icon" src="${escapeHtml(item.icon)}" alt="">`
-      : `<div class="store-card-icon-placeholder ${item.store}"><i class="${item.icon_class}"></i></div>`;
+    // Try to get a preview image: first check for local asset, then enriched icon
+    const previewSrc = item.preview || item.icon || '';
+    const previewHtml = previewSrc
+      ? `<img class="store-card-vertical-preview" src="${escapeHtml(previewSrc)}" alt="${escapeHtml(item.name)}" onerror="this.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="store-card-vertical-preview placeholder" style="display:none;"><i class="${item.icon_class}"></i></div>`
+      : `<div class="store-card-vertical-preview placeholder"><i class="${item.icon_class}"></i></div>`;
 
     return `
-      <a href="${escapeHtml(item.url)}" target="_blank" class="store-card">
-        <div class="store-card-header">
-          ${iconHtml}
-          <div>
-            <h3>${escapeHtml(item.name)}</h3>
-            <span class="store-badge ${item.store}">${item.storeLabel}</span>
-          </div>
+      <a href="${escapeHtml(item.url)}" target="_blank" class="store-card-vertical">
+        ${previewHtml}
+        <div class="store-card-vertical-body">
+          <h3>${escapeHtml(item.name)}</h3>
+          <span class="store-badge-v">${item.storeLabel}</span>
+          <p>${escapeHtml(item.description || 'No description available.')}</p>
         </div>
-        <p>${escapeHtml(item.description || 'No description available.')}</p>
-        <span class="btn btn-secondary"><i class="${item.icon_class}"></i> View in ${item.storeLabel}</span>
+        <span class="store-card-vertical-arrow"><i class="fas fa-chevron-right"></i></span>
       </a>`;
   }).join('');
 }
@@ -590,12 +590,14 @@ async function enrichStoreItem(item) {
             // Find icon asset
             const iconAsset = ext.versions?.[0]?.files?.find(f => f.assetType === 'Microsoft.VisualStudio.Services.Icons.Default');
             if (iconAsset) item.icon = iconAsset.source;
+            // Try to find screenshot/hero asset
+            const screenAsset = ext.versions?.[0]?.files?.find(f => f.assetType === 'Microsoft.VisualStudio.Services.Screenshots');
+            if (screenAsset) item.preview = screenAsset.source;
           }
         }
       }
     }
-    // Note: Apple and Google Play don't have public APIs for scraping.
-    // For those, the user fills in name/description/icon manually in the JSON.
+    // For Apple/Google stores, preview can be set manually in store-links.json as "preview" field
   } catch (e) {
     console.warn('Store enrichment failed:', e);
   }
@@ -946,43 +948,8 @@ function setupNav() {
     document.querySelector('.nav-links').classList.toggle('open');
   });
   // Close mobile nav on link click
-  document.querySelectorAll('.nav-links a:not(.nav-tab)').forEach(a => {
+  document.querySelectorAll('.nav-links a').forEach(a => {
     a.addEventListener('click', () => {
-      document.querySelector('.nav-links').classList.remove('open');
-    });
-  });
-
-  // Tab switching
-  document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      e.preventDefault();
-      const target = tab.dataset.tab;
-
-      // Switch active tab button
-      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      // Switch visible section links in nav
-      document.querySelectorAll('.nav-section-links').forEach(li => {
-        li.style.display = li.dataset.for === target ? '' : 'none';
-      });
-
-      // Switch visible tab groups
-      document.querySelectorAll('.tab-group').forEach(g => g.classList.remove('active'));
-      const group = document.getElementById(target);
-      if (group) group.classList.add('active');
-
-      // Scroll to top of the first section in the new tab
-      const firstSection = group && group.querySelector('section[id]');
-      if (firstSection) {
-        firstSection.scrollIntoView({ behavior: 'smooth' });
-      }
-
-      // Reveal fade-in elements that missed IntersectionObserver while hidden
-      if (group) {
-        group.querySelectorAll('.fade-in').forEach(el => el.classList.add('visible'));
-      }
-
       document.querySelector('.nav-links').classList.remove('open');
     });
   });
@@ -996,7 +963,7 @@ function setupNav() {
       const height = section.offsetHeight;
       const id = section.getAttribute('id');
       const link = document.querySelector(`.nav-links a[href="#${id}"]`);
-      if (link && !link.classList.contains('nav-tab')) {
+      if (link) {
         if (scrollY >= top && scrollY < top + height) link.classList.add('active');
         else link.classList.remove('active');
       }
@@ -1024,10 +991,6 @@ async function init() {
   setupNav();
   setupModal();
   setupFilters();
-  setupCurrencyConversion();
-  setupServiceCardToggle();
-  setupRateTabs();
-
 
   // Load everything in parallel
   await Promise.allSettled([

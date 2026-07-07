@@ -3,14 +3,16 @@
     {
       "name": "The Path",
       "url": "https://apps.apple.com/us/app/the-path/id6758647827",
-      "description": "",
-      "icon": ""
+      "description": "Find the longest path — a puzzle game of logic and patience.",
+      "icon": "",
+      "preview": "assets/store/the-path.png"
     },
     {
       "name": "日本Go",
       "url": "https://apps.apple.com/us/app/%E6%97%A5%E6%9C%ACgo/id6737426878?mt=12",
-      "description": "",
-      "icon": ""
+      "description": "Japanese language learning app for macOS.",
+      "icon": "",
+      "preview": "assets/store/nihongo.png"
     }
   ],
   "playStore": [],
@@ -18,8 +20,9 @@
     {
       "name": "Pseudocode Lang",
       "url": "https://marketplace.visualstudio.com/items?itemName=NagusameCS.pseudocode-lang",
-      "description": "",
-      "icon": ""
+      "description": "Syntax highlighting and language support for Pseudocode in VS Code.",
+      "icon": "",
+      "preview": "assets/store/pseudocode-lang.png"
     }
   ]
 }
