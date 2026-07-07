@@ -978,8 +978,17 @@ function setupNav() {
     });
   });
 
-  // Active link highlighting
+  // Active link highlighting + scroll progress + back-to-top
   const sections = document.querySelectorAll('section[id]');
+  const backToTop = document.getElementById('back-to-top');
+  const scrollProgress = document.getElementById('scroll-progress');
+
+  if (backToTop) {
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
   window.addEventListener('scroll', () => {
     const scrollY = window.scrollY + 100;
     sections.forEach(section => {
@@ -992,6 +1001,18 @@ function setupNav() {
         else link.classList.remove('active');
       }
     });
+
+    // Back to top visibility
+    if (backToTop) {
+      backToTop.classList.toggle('visible', window.scrollY > 500);
+    }
+
+    // Scroll progress bar
+    if (scrollProgress) {
+      const docH = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docH > 0 ? (window.scrollY / docH) * 100 : 0;
+      scrollProgress.style.width = Math.min(pct, 100) + '%';
+    }
   });
 }
 

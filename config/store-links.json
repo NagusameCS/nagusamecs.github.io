@@ -22,7 +22,7 @@
       "url": "https://marketplace.visualstudio.com/items?itemName=NagusameCS.pseudocode-lang",
       "description": "Syntax highlighting and language support for Pseudocode in VS Code.",
       "icon": "",
-      "preview": "assets/store/pseudocode-lang.png"
+      "preview": "assets/icons/pseudocode.png"
     }
   ]
 }
