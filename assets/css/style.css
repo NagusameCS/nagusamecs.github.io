@@ -2577,7 +2577,7 @@ footer {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .wave-svg {
@@ -2597,32 +2597,33 @@ footer {
 .wave-path-a {
   stroke: rgba(255,255,255,0.55);
   stroke-width: 1.8;
-  animation: helixA 5s ease-in-out infinite;
+  animation: helixA 6s linear infinite;
 }
 /* Strand B — rightward sine (opposing phase) */
 .wave-path-b {
   stroke: rgba(255,255,255,0.35);
   stroke-width: 1.3;
-  animation: helixB 5s ease-in-out infinite;
+  animation: helixB 6s linear infinite;
 }
 /* Center glow hint */
 .wave-path-glow {
   stroke: rgba(255,255,255,0.1);
   stroke-width: 4;
-  animation: helixGlow 5s ease-in-out infinite;
+  animation: helixGlow 6s linear infinite;
 }
 
 @keyframes helixA {
-  0%, 100% { transform: translateY(-40px); }
-  50% { transform: translateY(40px); }
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-100px); }
 }
 @keyframes helixB {
-  0%, 100% { transform: translateY(40px); }
-  50% { transform: translateY(-40px); }
+  0% { transform: translateY(-100px); }
+  100% { transform: translateY(0); }
 }
 @keyframes helixGlow {
-  0%, 100% { transform: translateY(-40px); opacity: 0.5; }
-  50% { transform: translateY(40px); opacity: 1; }
+  0% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(-50px); opacity: 1; }
+  100% { transform: translateY(-100px); opacity: 0.3; }
 }
 
 /* --- Right Visual --- */
