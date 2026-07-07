@@ -3,10 +3,31 @@
  * Pulls data live from GitHub API, config JSONs, and store APIs.
  */
 
-
 const GH_USER = 'NagusameCS';
 const GH_API = 'https://api.github.com';
 const CONFIG_BASE = 'config';
+
+// ===== LAZY SCRIPT LOADER =====
+let _lazyScriptsLoaded = false;
+function ensureModalScripts() {
+  if (_lazyScriptsLoaded) return Promise.resolve();
+  _lazyScriptsLoaded = true;
+  const scripts = [
+    'https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'
+  ];
+  const css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css';
+  document.head.appendChild(css);
+  return Promise.all(scripts.map(src => new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.body.appendChild(s);
+  })));
+}
 
 // Icon overrides — local SVG/PNG for specific repos
 const ICON_OVERRIDES = {
@@ -159,7 +180,7 @@ function renderRepos(repos) {
     const overrideIcon = ICON_OVERRIDES[repo.name];
 
     const socialPreviewHtml = isExpanded
-      ? `<img class="repo-card-preview" src="https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch || 'main'}/.github/social-preview.png" alt="" onerror="this.style.display='none'">`
+      ? `<img class="repo-card-preview" src="https://raw.githubusercontent.com/${GH_USER}/${repo.name}/${repo.default_branch || 'main'}/.github/social-preview.png" alt="" loading="lazy" decoding="async" onerror="this.style.display='none'">`
       : '';
 
     const letter = (repo.name.charAt(0) || '?').toUpperCase();
@@ -211,6 +232,9 @@ function repoIconFallback(img) {
 
 // ===== REPO MODAL =====
 function openRepoModal(repo) {
+  // Lazy-load marked.js + highlight.js on first modal open
+  ensureModalScripts();
+
   const modal = document.getElementById('repo-modal');
   const langColor = LANG_COLORS[repo.language] || '#8b949e';
   const overrideIcon = ICON_OVERRIDES[repo.name];
@@ -544,7 +568,7 @@ async function loadStoreApps() {
     // Try to get a preview image: first check for local asset, then enriched icon
     const previewSrc = item.preview || item.icon || '';
     const previewHtml = previewSrc
-      ? `<img class="store-card-vertical-preview" src="${escapeHtml(previewSrc)}" alt="${escapeHtml(item.name)}" onerror="this.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="store-card-vertical-preview placeholder" style="display:none;"><i class="${item.icon_class}"></i></div>`
+      ? `<img class="store-card-vertical-preview" src="${escapeHtml(previewSrc)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" onerror="this.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="store-card-vertical-preview placeholder" style="display:none;"><i class="${item.icon_class}"></i></div>`
       : `<div class="store-card-vertical-preview placeholder"><i class="${item.icon_class}"></i></div>`;
 
     return `

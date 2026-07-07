@@ -6,9 +6,12 @@
   <title>NagusameCS — Portfolio</title>
   <meta name="description" content="Portfolio of NagusameCS — Software Developer">
   <link rel="icon" type="image/png" href="assets/avatar.png">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="https://api.github.com">
+  <link rel="dns-prefetch" href="https://github-contributions-api.jogruber.de">
   <link rel="stylesheet" href="assets/css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all';this.onload=null;">
+  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
 </head>
 <body>
   <!-- Mobile Business Card -->
@@ -56,7 +59,7 @@
     <div class="hero-bg"></div>
     <div class="hero-content">
       <div class="avatar-orbit-wrapper">
-        <img id="avatar" src="" alt="Profile Picture" class="hero-avatar">
+        <img id="avatar" src="" alt="Profile Picture" class="hero-avatar" fetchpriority="high" decoding="async">
         <div class="hero-socials orbit-mode" id="hero-socials">
           <a href="mailto:nagusamecs@gmail.com" class="social-btn" title="Email" aria-label="Email" data-social="email">
             <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm16 2l-8 5-8-5v2l8 5 8-5V6z"/></svg>
@@ -233,7 +236,7 @@
       <!-- Right: Blurred Screenshot -->
       <div class="hypertensor-visual">
         <div class="hypertensor-screenshot">
-          <img src="assets/images/hypertensor-preview.png" alt="HyperTensor Preview" onerror="this.style.display='none';this.parentElement.classList.add('placeholder');">
+          <img src="assets/images/hypertensor-preview.png" alt="HyperTensor Preview" loading="lazy" decoding="async" onerror="this.style.display='none';this.parentElement.classList.add('placeholder');">
           <div class="screenshot-placeholder-content">
             <i class="fas fa-brain"></i>
             <span>HyperTensor</span>
@@ -371,8 +374,6 @@
     </div>
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   <script src="assets/js/app.js"></script>
 </body>
 </html>

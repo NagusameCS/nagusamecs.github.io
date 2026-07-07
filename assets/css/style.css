@@ -2140,6 +2140,15 @@ footer {
   transform: translateY(0);
 }
 
+/* Off-screen sections get content-visibility for faster paint */
+#repositories,
+#collaborations,
+#store-apps,
+#activity {
+  content-visibility: auto;
+  contain-intrinsic-size: 500px;
+}
+
 /* Card tilt perspective container */
 .repo-card,
 .collab-card,
@@ -2554,6 +2563,7 @@ footer {
   stroke: var(--border);
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
+  will-change: transform;
 }
 
 .wave-path-1 {
