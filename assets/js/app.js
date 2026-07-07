@@ -565,21 +565,19 @@ async function loadStoreApps() {
   const enriched = await Promise.all(items.map(item => enrichStoreItem(item)));
 
   grid.innerHTML = enriched.map(item => {
-    // Try to get a preview image: first check for local asset, then enriched icon
     const previewSrc = item.preview || item.icon || '';
     const previewHtml = previewSrc
-      ? `<img class="store-card-vertical-preview" src="${escapeHtml(previewSrc)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" onerror="this.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="store-card-vertical-preview placeholder" style="display:none;"><i class="${item.icon_class}"></i></div>`
-      : `<div class="store-card-vertical-preview placeholder"><i class="${item.icon_class}"></i></div>`;
+      ? `<img class="store-card-post-preview" src="${escapeHtml(previewSrc)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" onerror="this.classList.add('placeholder');this.style.display='none';this.nextElementSibling.style.display='flex';"><div class="store-card-post-preview placeholder" style="display:none;"><i class="${item.icon_class}"></i></div>`
+      : `<div class="store-card-post-preview placeholder"><i class="${item.icon_class}"></i></div>`;
 
     return `
-      <a href="${escapeHtml(item.url)}" target="_blank" class="store-card-vertical">
+      <a href="${escapeHtml(item.url)}" target="_blank" class="store-card-post">
         ${previewHtml}
-        <div class="store-card-vertical-body">
-          <h3>${escapeHtml(item.name)}</h3>
+        <div class="store-card-post-body">
           <span class="store-badge-v">${item.storeLabel}</span>
+          <h3>${escapeHtml(item.name)}</h3>
           <p>${escapeHtml(item.description || 'No description available.')}</p>
         </div>
-        <span class="store-card-vertical-arrow"><i class="fas fa-chevron-right"></i></span>
       </a>`;
   }).join('');
 }

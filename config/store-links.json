@@ -5,14 +5,14 @@
       "url": "https://apps.apple.com/us/app/the-path/id6758647827",
       "description": "Find the longest path — a puzzle game of logic and patience.",
       "icon": "",
-      "preview": "assets/store/the-path.png"
+      "preview": "assets/store/the-path-app.png"
     },
     {
       "name": "日本Go",
       "url": "https://apps.apple.com/us/app/%E6%97%A5%E6%9C%ACgo/id6737426878?mt=12",
       "description": "Japanese language learning app for macOS.",
       "icon": "",
-      "preview": "assets/store/nihongo.png"
+      "preview": "assets/store/nihongo-app.png"
     }
   ],
   "playStore": [],
