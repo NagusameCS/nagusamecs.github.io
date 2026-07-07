@@ -1033,102 +1033,144 @@ function setupWireframeManifold() {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  const GRID = 24;              // 24×24 vertices = 576 points (very light)
-  const LINE_COLOR = 'rgba(255,255,255,';
-  let angle = 0;
+  const GRID = 18;              // 18×18 = 324 vertices — cleaner look
+  let angleY = 0.6;            // start tilted so saddle is visible
+  let angleX = 0.25;
   let animId;
 
   function resize() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // cap at 2x for perf
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = rect.width * dpr;
     canvas.height = rect.height * dpr;
-    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scale
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
   }
 
   function project(x, y, z, w, h) {
-    // Rotate around Y axis
-    const cos = Math.cos(angle), sin = Math.sin(angle);
-    const rx = x * cos - z * sin;
-    const rz = x * sin + z * cos;
-    // Simple perspective
-    const scale = 300 / (300 + rz);
+    // Rotate around Y, then X
+    const cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+    const cosX = Math.cos(angleX), sinX = Math.sin(angleX);
+    // Y rotation
+    let rx = x * cosY - z * sinY;
+    let rz = x * sinY + z * cosY;
+    let ry = y;
+    // X rotation
+    const ry2 = ry * cosX - rz * sinX;
+    const rz2 = ry * sinX + rz * cosX;
+    // Perspective projection
+    const dist = 3.5;
+    const scale = 1 / (dist + rz2);
     return {
-      px: w / 2 + rx * scale * w * 0.38,
-      py: h / 2 - y * scale * h * 0.55
+      px: w / 2 + rx * scale * w * 0.42,
+      py: h / 2 - ry2 * scale * h * 0.48,
+      z: rz2
     };
   }
 
   function surface(u, v) {
-    // Hyperbolic paraboloid: z = (u² - v²) — the classic Riemann saddle
-    const s = (u - 0.5) * 2.8;
-    const t = (v - 0.5) * 2.8;
+    const s = (u - 0.5) * 2.6;
+    const t = (v - 0.5) * 2.6;
     return {
       x: s,
       y: t,
-      z: (s * s - t * t) * 0.9
+      z: (s * s - t * t) * 1.2  // deeper saddle
     };
   }
 
-  function render(now) {
+  function render() {
     const w = canvas.clientWidth;
     const h = canvas.clientHeight;
     if (w === 0 || h === 0) { animId = requestAnimationFrame(render); return; }
 
-    ctx.clearRect(0, 0, w, h);
+    // Subtle radial gradient background
+    const bg = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w*0.7);
+    bg.addColorStop(0, 'rgba(255,255,255,0.03)');
+    bg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
 
-    // Pre-compute all projected vertices
+    // Pre-compute vertices with surface Z
     const verts = [];
+    const zVals = [];
     for (let i = 0; i <= GRID; i++) {
       verts[i] = [];
+      zVals[i] = [];
       for (let j = 0; j <= GRID; j++) {
-        const u = i / GRID;
-        const v = j / GRID;
-        const p = surface(u, v);
+        const p = surface(i / GRID, j / GRID);
+        zVals[i][j] = p.z;
         verts[i][j] = project(p.x, p.y, p.z, w, h);
       }
     }
 
-    // Draw wireframe — horizontal lines (constant u)
+    // Find Z range for depth mapping
+    let zMin = Infinity, zMax = -Infinity;
+    for (let i = 0; i <= GRID; i++)
+      for (let j = 0; j <= GRID; j++) {
+        const vz = verts[i][j].z;
+        if (vz < zMin) zMin = vz;
+        if (vz > zMax) zMax = vz;
+      }
+    const zSpan = zMax - zMin || 1;
+
+    // Normalize projected-Z to 0..1 (0 = farthest, 1 = nearest)
+    function depth(i, j) {
+      return (verts[i][j].z - zMin) / zSpan;
+    }
+
+    // Draw wireframe — u-direction lines (like latitude)
     for (let i = 0; i <= GRID; i++) {
       ctx.beginPath();
       for (let j = 0; j <= GRID; j++) {
         const { px, py } = verts[i][j];
-        const zNorm = (surface(i / GRID, j / GRID).z + 2.5) / 5; // 0..1 depth
-        const alpha = 0.12 + zNorm * 0.25;
-        ctx.strokeStyle = LINE_COLOR + alpha.toFixed(2) + ')';
-        ctx.lineWidth = 0.5 + zNorm * 0.4;
+        const d = depth(i, j);
+        const alpha = 0.06 + d * 0.50;
+        ctx.strokeStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
+        ctx.lineWidth = 0.3 + d * 0.8;
         if (j === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
       }
       ctx.stroke();
     }
 
-    // Draw wireframe — vertical lines (constant v)
+    // Draw wireframe — v-direction lines (like longitude)
     for (let j = 0; j <= GRID; j++) {
       ctx.beginPath();
       for (let i = 0; i <= GRID; i++) {
         const { px, py } = verts[i][j];
-        const zNorm = (surface(i / GRID, j / GRID).z + 2.5) / 5;
-        const alpha = 0.12 + zNorm * 0.25;
-        ctx.strokeStyle = LINE_COLOR + alpha.toFixed(2) + ')';
-        ctx.lineWidth = 0.5 + zNorm * 0.4;
+        const d = depth(i, j);
+        const alpha = 0.06 + d * 0.50;
+        ctx.strokeStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
+        ctx.lineWidth = 0.3 + d * 0.8;
         if (i === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
       }
       ctx.stroke();
     }
 
-    angle += 0.004; // slow rotation
+    // Draw vertex dots — glowing intersection points
+    for (let i = 0; i <= GRID; i++) {
+      for (let j = 0; j <= GRID; j++) {
+        const { px, py } = verts[i][j];
+        const d = depth(i, j);
+        if (d < 0.15) continue; // skip far-away dots
+        const alpha = 0.10 + d * 0.55;
+        const r = 0.6 + d * 1.6;
+        ctx.beginPath();
+        ctx.arc(px, py, r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
+        ctx.fill();
+      }
+    }
+
+    angleY += 0.005;
+    angleX += 0.0015;
     animId = requestAnimationFrame(render);
   }
 
   resize();
   window.addEventListener('resize', resize);
   animId = requestAnimationFrame(render);
-
-  // Cleanup on page unload
   window.addEventListener('beforeunload', () => cancelAnimationFrame(animId));
 }
 
