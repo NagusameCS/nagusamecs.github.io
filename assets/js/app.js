@@ -1027,6 +1027,111 @@ function setupScrollAnimations() {
   document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 }
 
+// ===== 3D WIREFRAME MANIFOLD RENDERER =====
+function setupWireframeManifold() {
+  const canvas = document.getElementById('hypertensor-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const GRID = 24;              // 24×24 vertices = 576 points (very light)
+  const LINE_COLOR = 'rgba(255,255,255,';
+  let angle = 0;
+  let animId;
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // cap at 2x for perf
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scale
+    ctx.scale(dpr, dpr);
+  }
+
+  function project(x, y, z, w, h) {
+    // Rotate around Y axis
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const rx = x * cos - z * sin;
+    const rz = x * sin + z * cos;
+    // Simple perspective
+    const scale = 300 / (300 + rz);
+    return {
+      px: w / 2 + rx * scale * w * 0.38,
+      py: h / 2 - y * scale * h * 0.55
+    };
+  }
+
+  function surface(u, v) {
+    // Hyperbolic paraboloid: z = (u² - v²) — the classic Riemann saddle
+    const s = (u - 0.5) * 2.8;
+    const t = (v - 0.5) * 2.8;
+    return {
+      x: s,
+      y: t,
+      z: (s * s - t * t) * 0.9
+    };
+  }
+
+  function render(now) {
+    const w = canvas.clientWidth;
+    const h = canvas.clientHeight;
+    if (w === 0 || h === 0) { animId = requestAnimationFrame(render); return; }
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Pre-compute all projected vertices
+    const verts = [];
+    for (let i = 0; i <= GRID; i++) {
+      verts[i] = [];
+      for (let j = 0; j <= GRID; j++) {
+        const u = i / GRID;
+        const v = j / GRID;
+        const p = surface(u, v);
+        verts[i][j] = project(p.x, p.y, p.z, w, h);
+      }
+    }
+
+    // Draw wireframe — horizontal lines (constant u)
+    for (let i = 0; i <= GRID; i++) {
+      ctx.beginPath();
+      for (let j = 0; j <= GRID; j++) {
+        const { px, py } = verts[i][j];
+        const zNorm = (surface(i / GRID, j / GRID).z + 2.5) / 5; // 0..1 depth
+        const alpha = 0.12 + zNorm * 0.25;
+        ctx.strokeStyle = LINE_COLOR + alpha.toFixed(2) + ')';
+        ctx.lineWidth = 0.5 + zNorm * 0.4;
+        if (j === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    // Draw wireframe — vertical lines (constant v)
+    for (let j = 0; j <= GRID; j++) {
+      ctx.beginPath();
+      for (let i = 0; i <= GRID; i++) {
+        const { px, py } = verts[i][j];
+        const zNorm = (surface(i / GRID, j / GRID).z + 2.5) / 5;
+        const alpha = 0.12 + zNorm * 0.25;
+        ctx.strokeStyle = LINE_COLOR + alpha.toFixed(2) + ')';
+        ctx.lineWidth = 0.5 + zNorm * 0.4;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+
+    angle += 0.004; // slow rotation
+    animId = requestAnimationFrame(render);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  animId = requestAnimationFrame(render);
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => cancelAnimationFrame(animId));
+}
+
 // ===== INIT =====
 document.getElementById('year').textContent = new Date().getFullYear();
 
@@ -1034,6 +1139,7 @@ async function init() {
   setupNav();
   setupModal();
   setupFilters();
+  setupWireframeManifold();
 
   // Load everything in parallel
   await Promise.allSettled([

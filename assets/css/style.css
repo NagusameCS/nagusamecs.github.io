@@ -2636,55 +2636,14 @@ footer {
   z-index: 2;
 }
 
-.hypertensor-screenshot {
-  position: relative;
+.hypertensor-canvas {
   width: 100%;
   max-width: 440px;
   aspect-ratio: 16/10;
   border-radius: var(--radius);
-  overflow: hidden;
   border: 1px solid var(--border);
   background: var(--bg-tertiary);
-}
-
-.hypertensor-screenshot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease, box-shadow 0.5s ease;
-}
-
-.hypertensor-screenshot:hover img {
-  transform: scale(1.03);
-}
-.hypertensor-screenshot:hover {
-  box-shadow: 0 0 40px rgba(255,255,255,0.06);
-}
-
-.hypertensor-screenshot.placeholder .screenshot-placeholder-content {
-  display: flex;
-}
-
-.screenshot-placeholder-content {
-  display: none;
-  position: absolute;
-  inset: 0;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: var(--text-muted);
-}
-
-.screenshot-placeholder-content i {
-  font-size: 2.5rem;
-  opacity: 0.3;
-}
-
-.screenshot-placeholder-content span {
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 1px;
+  display: block;
 }
 
 .hypertensor-glow {
@@ -2718,7 +2677,7 @@ footer {
   .hypertensor-visual {
     padding-left: 0;
   }
-  .hypertensor-screenshot {
+  .hypertensor-canvas {
     max-width: 100%;
   }
 }
