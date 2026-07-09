@@ -344,6 +344,11 @@ section {
   opacity: 0.5;
 }
 
+.zenodo-icon {
+  vertical-align: -2px;
+  flex-shrink: 0;
+}
+
 /* ===== EXPERIENCE ===== */
 .timeline-wrapper {
   flex: 0.7;
