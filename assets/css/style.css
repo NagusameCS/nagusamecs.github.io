@@ -2068,8 +2068,6 @@ footer {
   .featured-card { padding: 20px; }
   .contact-links { flex-direction: column; align-items: center; }
   .contact-links .btn { width: 100%; justify-content: center; }
-  .nav-resume { margin-top: 4px; }
-  .nav-resume a { margin-left: 0; display: inline-block; }
 
   /* ===== FOOTER ===== */
   footer { padding: 20px 0; font-size: 0.75rem; }
@@ -2832,15 +2830,6 @@ footer {
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
-}
-
-/* ===== NAV RESUME LINK ===== */
-.nav-resume a {
-  border: 1px solid var(--border) !important;
-  border-radius: var(--radius-sm);
-  padding: 5px 12px !important;
-  margin-left: 4px;
-  font-weight: 500;
 }
 
 /* ===== BACK TO TOP ===== */
