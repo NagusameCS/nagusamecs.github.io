@@ -2763,30 +2763,43 @@ footer {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  padding: 24px;
+  padding: 28px 24px 24px;
   text-decoration: none;
   color: var(--text-primary);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+.featured-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 12px; bottom: 12px;
+  width: 2px;
+  border-radius: 0 2px 2px 0;
+  background: var(--border);
+  transition: background 0.3s ease, width 0.3s ease;
 }
 .featured-card:hover {
   border-color: #444;
   transform: translateY(-3px);
   box-shadow: 0 12px 32px rgba(0,0,0,0.4);
 }
-.featured-card-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-sm);
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 14px;
-  font-size: 1.1rem;
+.featured-card:hover::before {
+  background: rgba(255,255,255,0.5);
+  width: 3px;
+}
+.featured-tag {
+  display: inline-block;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
   color: var(--text-muted);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-bottom: 12px;
+  align-self: flex-start;
 }
 .featured-card h3 {
   font-size: 1rem;
