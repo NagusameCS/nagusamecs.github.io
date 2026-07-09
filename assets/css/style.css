@@ -2621,17 +2621,16 @@ footer {
 }
 
 @keyframes helixA {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-100px); }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-100px); }
 }
 @keyframes helixB {
-  0% { transform: translateY(-100px); }
-  100% { transform: translateY(0); }
+  0%, 100% { transform: translateY(-100px); }
+  50% { transform: translateY(0); }
 }
 @keyframes helixGlow {
-  0% { transform: translateY(0); opacity: 0.3; }
-  50% { transform: translateY(-50px); opacity: 1; }
-  100% { transform: translateY(-100px); opacity: 0.3; }
+  0%, 100% { transform: translateY(0); opacity: 0.3; }
+  50% { transform: translateY(-100px); opacity: 1; }
 }
 
 /* --- Right Visual --- */
