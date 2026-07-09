@@ -2582,6 +2582,26 @@ footer {
   color: var(--text-primary);
 }
 
+.hypertensor-cta-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.hypertensor-cta-icon:hover {
+  border-color: #555;
+  color: var(--text-primary);
+  background: rgba(255,255,255,0.06);
+}
+
 .hypertensor-cta .chevron-icon {
   width: 18px;
   height: 18px;
