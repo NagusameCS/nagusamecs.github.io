@@ -1033,7 +1033,7 @@ function setupWireframeManifold() {
   if (!canvas) return;
 
   const ctx = canvas.getContext('2d');
-  const GRID = 18;              // 18×18 = 324 vertices — cleaner look
+  const GRID = 16;              // 16×16 = 256 vertices — clean, no noise
   let angleY = 0.6;            // start tilted so saddle is visible
   let angleX = 0.25;
   let animId;
@@ -1083,22 +1083,14 @@ function setupWireframeManifold() {
     const h = canvas.clientHeight;
     if (w === 0 || h === 0) { animId = requestAnimationFrame(render); return; }
 
-    // Subtle radial gradient background
-    const bg = ctx.createRadialGradient(w/2, h/2, 0, w/2, h/2, w*0.7);
-    bg.addColorStop(0, 'rgba(255,255,255,0.03)');
-    bg.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);
 
-    // Pre-compute vertices with surface Z
+    // Pre-compute vertices
     const verts = [];
-    const zVals = [];
     for (let i = 0; i <= GRID; i++) {
       verts[i] = [];
-      zVals[i] = [];
       for (let j = 0; j <= GRID; j++) {
         const p = surface(i / GRID, j / GRID);
-        zVals[i][j] = p.z;
         verts[i][j] = project(p.x, p.y, p.z, w, h);
       }
     }
@@ -1118,44 +1110,44 @@ function setupWireframeManifold() {
       return (verts[i][j].z - zMin) / zSpan;
     }
 
-    // Draw wireframe — u-direction lines (like latitude)
+    // Draw wireframe — u-direction lines
     for (let i = 0; i <= GRID; i++) {
       ctx.beginPath();
       for (let j = 0; j <= GRID; j++) {
         const { px, py } = verts[i][j];
         const d = depth(i, j);
-        const alpha = 0.06 + d * 0.50;
+        const alpha = 0.04 + d * 0.48;
         ctx.strokeStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
-        ctx.lineWidth = 0.3 + d * 0.8;
+        ctx.lineWidth = 0.25 + d * 0.65;
         if (j === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
       }
       ctx.stroke();
     }
 
-    // Draw wireframe — v-direction lines (like longitude)
+    // Draw wireframe — v-direction lines
     for (let j = 0; j <= GRID; j++) {
       ctx.beginPath();
       for (let i = 0; i <= GRID; i++) {
         const { px, py } = verts[i][j];
         const d = depth(i, j);
-        const alpha = 0.06 + d * 0.50;
+        const alpha = 0.04 + d * 0.48;
         ctx.strokeStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';
-        ctx.lineWidth = 0.3 + d * 0.8;
+        ctx.lineWidth = 0.25 + d * 0.65;
         if (i === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
       }
       ctx.stroke();
     }
 
-    // Draw vertex dots — glowing intersection points
+    // Draw vertex dots — only the very nearest for a subtle sparkle
     for (let i = 0; i <= GRID; i++) {
       for (let j = 0; j <= GRID; j++) {
         const { px, py } = verts[i][j];
         const d = depth(i, j);
-        if (d < 0.15) continue; // skip far-away dots
-        const alpha = 0.10 + d * 0.55;
-        const r = 0.6 + d * 1.6;
+        if (d < 0.45) continue;
+        const alpha = 0.08 + d * 0.35;
+        const r = 0.4 + d * 1.0;
         ctx.beginPath();
         ctx.arc(px, py, r, 0, Math.PI * 2);
         ctx.fillStyle = 'rgba(255,255,255,' + alpha.toFixed(3) + ')';

@@ -2656,9 +2656,6 @@ footer {
   width: 100%;
   max-width: 440px;
   aspect-ratio: 16/10;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg-tertiary);
   display: block;
 }
 
