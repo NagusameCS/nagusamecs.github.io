@@ -1025,7 +1025,7 @@ function setupWireframeManifold() {
   const ctx = canvas.getContext('2d');
   const GRID = 16;              // 16×16 = 256 vertices — clean, no noise
   let angleY = 0.6;            // start tilted so saddle is visible
-  let angleX = 0.25;
+  let angleX = 0;              // driven by scroll position
   let animId;
 
   function resize() {
@@ -1145,8 +1145,16 @@ function setupWireframeManifold() {
       }
     }
 
+    // Y-axis: continuous slow spin. X-axis: driven by scroll position
     angleY += 0.005;
-    angleX += 0.0015;
+    const section = document.getElementById('hypertensor');
+    if (section) {
+      const rect = section.getBoundingClientRect();
+      const viewH = window.innerHeight;
+      // Map section center relative to viewport center: -1 (above) to +1 (below)
+      const centerOffset = (rect.top + rect.height / 2 - viewH / 2) / (viewH * 0.8);
+      angleX = Math.max(-0.7, Math.min(0.7, centerOffset * 1.2));
+    }
     animId = requestAnimationFrame(render);
   }
 
