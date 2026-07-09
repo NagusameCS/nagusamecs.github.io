@@ -1810,15 +1810,7 @@ footer {
   transition: transform 0.3s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s ease;
 }
 
-/* ===== MOBILE BUSINESS CARD ===== */
-#mobile-card {
-  display: none;
-}
-
 @media (max-width: 768px) {
-  /* Hide mobile card if present */
-  #mobile-card { display: none !important; }
-
   /* ===== NAV ===== */
   .nav-container {
     height: 52px;
