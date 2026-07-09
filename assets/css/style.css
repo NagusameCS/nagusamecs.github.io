@@ -2893,6 +2893,6 @@ footer {
   background: var(--text-primary);
   z-index: 1001;
   width: 0%;
-  transition: width 0.1s linear;
+  transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 

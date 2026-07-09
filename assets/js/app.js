@@ -995,11 +995,19 @@ function setupNav() {
       backToTop.classList.toggle('visible', window.scrollY > 500);
     }
 
-    // Scroll progress bar
+    // Stepped scroll progress bar — snaps to section checkpoints
     if (scrollProgress) {
-      const docH = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = docH > 0 ? (window.scrollY / docH) * 100 : 0;
-      scrollProgress.style.width = Math.min(pct, 100) + '%';
+      const checkpoints = ['about','experience','hypertensor','repositories','store-apps','activity','contact'];
+      const total = checkpoints.length;
+      let activeIdx = 0;
+      const scrollY = window.scrollY + window.innerHeight / 3;
+      for (let i = checkpoints.length - 1; i >= 0; i--) {
+        const el = document.getElementById(checkpoints[i]);
+        if (el && scrollY >= el.offsetTop) { activeIdx = i; break; }
+      }
+      // Fill up to and including the current section
+      const pct = ((activeIdx + 1) / total) * 100;
+      scrollProgress.style.width = pct + '%';
     }
   });
 }
