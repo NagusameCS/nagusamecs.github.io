@@ -349,6 +349,11 @@ section {
   flex-shrink: 0;
 }
 
+.orcid-icon {
+  vertical-align: -2px;
+  flex-shrink: 0;
+}
+
 /* ===== EXPERIENCE ===== */
 .timeline-wrapper {
   flex: 0.7;
