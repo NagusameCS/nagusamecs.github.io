@@ -103,23 +103,11 @@ async function loadProfile() {
   const bioText = profile.bio || 'Great things are not done quickly';
   document.getElementById('bio').textContent = bioText;
 
-  // Meta
-  if (profile.company) {
-    document.getElementById('company-link').textContent = profile.company;
-  } else {
-    document.getElementById('company').style.display = 'none';
-  }
+  // Meta — location from GitHub, ORCID + Paper are hardcoded in HTML
   if (profile.location) {
     document.querySelector('#location span').textContent = profile.location;
   } else {
     document.getElementById('location').style.display = 'none';
-  }
-  if (profile.blog) {
-    const blogA = document.querySelector('#blog a');
-    blogA.href = profile.blog.startsWith('http') ? profile.blog : `https://${profile.blog}`;
-    blogA.textContent = profile.blog.replace(/^https?:\/\//, '');
-  } else {
-    document.getElementById('blog').style.display = 'none';
   }
 
   // Stats

@@ -337,6 +337,13 @@ section {
   font-weight: 400;
 }
 
+.deprecated {
+  font-size: 0.7em;
+  color: var(--text-muted);
+  font-weight: 400;
+  opacity: 0.5;
+}
+
 /* ===== EXPERIENCE ===== */
 .timeline-wrapper {
   flex: 0.7;
