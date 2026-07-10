@@ -348,6 +348,7 @@ section {
   vertical-align: -2px;
   flex-shrink: 0;
   image-rendering: auto;
+  opacity: 0.7;
 }
 
 .orcid-icon {
