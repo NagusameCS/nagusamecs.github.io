@@ -344,9 +344,10 @@ section {
   opacity: 0.5;
 }
 
-.zenodo-icon {
+.brand-icon {
   vertical-align: -2px;
   flex-shrink: 0;
+  image-rendering: auto;
 }
 
 .orcid-icon {
